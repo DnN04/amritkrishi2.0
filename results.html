@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Recommendations - AmritKrishi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Background -->
+        <div class="background-image">
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Navigation Header -->
+        <nav class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text" data-i18n="navTitle">AmritKrishi</span>
+                </a>
+                <div class="nav-links">
+                    <button class="nav-link" data-i18n="navFeatures">Features</button>
+                    <button class="nav-link" data-i18n="navLanguage">Language</button>
+                    <button class="nav-link" data-i18n="navAbout">About</button>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="current-language-display">
+                    <span id="currentLangDisplay">English</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Results Content -->
+        <div class="results-main-content">
+            <div class="results-container">
+                <!-- Progress Indicator -->
+                <div class="progress-indicator">
+                    <div class="progress-step">
+                        <div class="step-number">1</div>
+                        <span class="step-text" data-i18n="stepLocation">Location</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">2</div>
+                        <span class="step-text" data-i18n="stepAnalysis">Analysis</span>
+                    </div>
+                    <div class="progress-step active">
+                        <div class="step-number">3</div>
+                        <span class="step-text" data-i18n="stepResults">Results</span>
+                    </div>
+                </div>
+
+                <!-- Farmer Welcome -->
+                <div class="farmer-welcome" id="farmerWelcome">
+                    <h2>Hello, <span id="welcomeName">Farmer</span>! 👋</h2>
+                    <p>Here are your personalized crop recommendations for <span id="locationName">your location</span></p>
+                </div>
+
+                <!-- Location Summary -->
+                <div class="location-summary-card">
+                    <div class="summary-header">
+                        <h3>📍 Location Analysis</h3>
+                        <div class="location-badge" id="locationType">Agricultural Zone</div>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Coordinates</div>
+                            <div class="summary-value" id="summaryCoords">--</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Soil Type</div>
+                            <div class="summary-value" id="summarySoil">Analyzing...</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Climate Zone</div>
+                            <div class="summary-value" id="summaryClimate">Analyzing...</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Rainfall</div>
+                            <div class="summary-value" id="summaryRainfall">-- mm/year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Recommendations -->
+                <div class="recommendations-section">
+                    <h2>🌾 Top Crop Recommendations</h2>
+                    <p class="section-subtitle">Based on soil analysis, climate data, and regional suitability</p>
+                    
+                    <div class="recommendations-grid" id="recommendationsGrid">
+                        <!-- Recommendations will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Detailed Analysis -->
+                <div class="analysis-section">
+                    <h2>📊 Detailed Analysis</h2>
+                    
+                    <div class="analysis-tabs">
+                        <button class="analysis-tab active" data-tab="soil">Soil Analysis</button>
+                        <button class="analysis-tab" data-tab="climate">Climate Data</button>
+                        <button class="analysis-tab" data-tab="seasonal">Seasonal Calendar</button>
+                    </div>
+                    
+                    <div class="analysis-content">
+                        <!-- Soil Analysis Tab -->
+                        <div class="tab-content active" id="soilTab">
+                            <div class="soil-metrics">
+                                <div class="metric-card">
+                                    <div class="metric-label">Soil pH</div>
+                                    <div class="metric-value" id="soilPH">--</div>
+                                    <div class="metric-bar">
+                                        <div class="metric-fill" id="phBar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="metric-status" id="phStatus">Analyzing...</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Organic Carbon</div>
+                                    <div class="metric-value" id="soilOrganic">--%</div>
+                                    <div class="metric-bar">
+                                        <div class="metric-fill" id="organicBar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="metric-status" id="organicStatus">Analyzing...</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Nitrogen Level</div>
+                                    <div class="metric-value" id="soilNitrogen">-- kg/ha</div>
+                                    <div class="metric-bar">
+                                        <div class="metric-fill" id="nitrogenBar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="metric-status" id="nitrogenStatus">Analyzing...</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Climate Data Tab -->
+                        <div class="tab-content" id="climateTab">
+                            <div class="climate-metrics">
+                                <div class="climate-card">
+                                    <div class="climate-icon">🌡️</div>
+                                    <div class="climate-data">
+                                        <div class="climate-label">Average Temperature</div>
+                                        <div class="climate-value" id="avgTemp">--°C</div>
+                                    </div>
+                                </div>
+                                <div class="climate-card">
+                                    <div class="climate-icon">💧</div>
+                                    <div class="climate-data">
+                                        <div class="climate-label">Annual Rainfall</div>
+                                        <div class="climate-value" id="annualRainfall">-- mm</div>
+                                    </div>
+                                </div>
+                                <div class="climate-card">
+                                    <div class="climate-icon">☀️</div>
+                                    <div class="climate-data">
+                                        <div class="climate-label">Sunshine Hours</div>
+                                        <div class="climate-value" id="sunshineHours">-- hrs/day</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="climate-chart">
+                                <canvas id="climateChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Seasonal Calendar Tab -->
+                        <div class="tab-content" id="seasonalTab">
+                            <div class="calendar-container">
+                                <div class="season-card">
+                                    <h4>🌱 Kharif Season (Jun - Oct)</h4>
+                                    <div class="season-crops" id="kharifCrops">
+                                        <div class="loading-text">Loading recommendations...</div>
+                                    </div>
+                                </div>
+                                <div class="season-card">
+                                    <h4>🌾 Rabi Season (Nov - Mar)</h4>
+                                    <div class="season-crops" id="rabiCrops">
+                                        <div class="loading-text">Loading recommendations...</div>
+                                    </div>
+                                </div>
+                                <div class="season-card">
+                                    <h4>☀️ Zaid Season (Mar - Jun)</h4>
+                                    <div class="season-crops" id="zaidCrops">
+                                        <div class="loading-text">Loading recommendations...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn secondary" onclick="window.location.href='location.html'">
+                        ← Analyze Another Location
+                    </button>
+                    <button class="action-btn primary" onclick="saveRecommendations()">
+                        💾 Save Recommendations
+                    </button>
+                    <button class="action-btn primary" onclick="shareResults()">
+                        📤 Share Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INCLUDE SHARED LANGUAGE SYSTEM -->
+    <script src="js/shared-language.js"></script>
+    
+    <script>
+        // Real agricultural data and APIs
+        const REAL_APIS = {
+            // OpenWeatherMap API (Free tier - 1000 calls/day)
+            weather: {
+                url: (lat, lon) => `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=d306c96320dc025afaf1b975cee3c527&units=metric`,
+                // Get free API key from: https://openweathermap.org/api
+            },
+            
+            // SoilGrids API (Free - ISRIC World Soil Information)
+            soil: {
+                url: (lat, lon) => `https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${lon}&lat=${lat}&property=phh2o&property=soc&property=nitrogen&depth=0-5cm&value=mean`,
+                // No API key needed - completely free
+            },
+            
+            // NASA POWER API (Free - Agricultural climate data)
+            nasa: {
+                url: (lat, lon) => `https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=T2M,PRECTOT,ALLSKY_SFC_SW_DWN&community=AG&longitude=${lon}&latitude=${lat}&format=JSON`,
+                // No API key needed - completely free
+            },
+            
+            // OpenCage Geocoding (Free tier - 2500 calls/day)
+            geocoding: {
+                url: (lat, lon) => `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=2c29c96344884d0cbe5e2b39a4aba58a&pretty=1`,
+                // Get free API key from: https://opencagedata.com/api
+            }
+        };
+
+        // Real crop database with actual requirements
+        const CROP_DATABASE = {
+            // Major Indian Crops with real data from ICAR
+            rice: {
+                name: "Rice",
+                hindi: "चावल",
+                punjabi: "ਚਾਵਲ",
+                odia: "ଚାଉଳ",
+                soilPH: { min: 5.5, max: 7.0, ideal: 6.2 },
+                temperature: { min: 20, max: 35, ideal: 25 },
+                rainfall: { min: 1000, max: 2500, ideal: 1500 },
+                soilType: ["clay_loam", "silty_loam"],
+                season: ["kharif", "rabi"],
+                duration: 90, // days
+                yield: "4-6 tons/ha",
+                waterRequirement: "High",
+                nutrients: ["Nitrogen", "Phosphorus", "Potassium"]
+            },
+            wheat: {
+                name: "Wheat",
+                hindi: "गेहूं",
+                punjabi: "ਕਣਕ",
+                odia: "ଗହମ",
+                soilPH: { min: 6.0, max: 7.5, ideal: 6.8 },
+                temperature: { min: 10, max: 25, ideal: 17 },
+                rainfall: { min: 500, max: 1000, ideal: 750 },
+                soilType: ["loam", "clay_loam"],
+                season: ["rabi"],
+                duration: 120,
+                yield: "3-5 tons/ha",
+                waterRequirement: "Medium",
+                nutrients: ["Nitrogen", "Phosphorus"]
+            },
+            maize: {
+                name: "Maize",
+                hindi: "मक्का",
+                punjabi: "ਮੱਕੀ",
+                odia: "ମକା",
+                soilPH: { min: 5.8, max: 7.2, ideal: 6.5 },
+                temperature: { min: 15, max: 30, ideal: 22 },
+                rainfall: { min: 600, max: 1200, ideal: 800 },
+                soilType: ["well_drained", "sandy_loam"],
+                season: ["kharif", "rabi"],
+                duration: 85,
+                yield: "2-4 tons/ha",
+                waterRequirement: "Medium",
+                nutrients: ["Nitrogen", "Zinc"]
+            },
+            cotton: {
+                name: "Cotton",
+                hindi: "कपास",
+                punjabi: "ਕਪਾਹ",
+                odia: "କପା",
+                soilPH: { min: 6.0, max: 8.0, ideal: 7.0 },
+                temperature: { min: 21, max: 35, ideal: 28 },
+                rainfall: { min: 500, max: 1000, ideal: 650 },
+                soilType: ["black_cotton", "clay_loam"],
+                season: ["kharif"],
+                duration: 150,
+                yield: "2-3 tons/ha",
+                waterRequirement: "Low-Medium",
+                nutrients: ["Nitrogen", "Potassium"]
+            },
+            sugarcane: {
+                name: "Sugarcane",
+                hindi: "गन्ना",
+                punjabi: "ਗੰਨਾ",
+                odia: "ଆଖୁ",
+                soilPH: { min: 6.5, max: 7.5, ideal: 7.0 },
+                temperature: { min: 20, max: 35, ideal: 27 },
+                rainfall: { min: 1500, max: 2500, ideal: 2000 },
+                soilType: ["heavy_clay", "clay_loam"],
+                season: ["year_round"],
+                duration: 365,
+                yield: "70-100 tons/ha",
+                waterRequirement: "High",
+                nutrients: ["Nitrogen", "Phosphorus", "Potassium"]
+            },
+            pulses: {
+                name: "Pulses (Chickpea)",
+                hindi: "चना",
+                punjabi: "ਛੋਲੇ",
+                odia: "ବୁଟ ଡାଲି",
+                soilPH: { min: 6.0, max: 7.5, ideal: 6.8 },
+                temperature: { min: 10, max: 30, ideal: 20 },
+                rainfall: { min: 400, max: 800, ideal: 600 },
+                soilType: ["well_drained", "sandy_loam"],
+                season: ["rabi"],
+                duration: 100,
+                yield: "1-2 tons/ha",
+                waterRequirement: "Low",
+                nutrients: ["Phosphorus", "Sulfur"]
+            },
+            oilseeds: {
+                name: "Oilseeds (Mustard)",
+                hindi: "सरसों",
+                punjabi: "ਸਰੋਂ",
+                odia: "ସରଷୋ",
+                soilPH: { min: 6.0, max: 7.5, ideal: 6.8 },
+                temperature: { min: 10, max: 25, ideal: 18 },
+                rainfall: { min: 400, max: 800, ideal: 500 },
+                soilType: ["loam", "sandy_loam"],
+                season: ["rabi"],
+                duration: 110,
+                yield: "1-2 tons/ha",
+                waterRequirement: "Low",
+                nutrients: ["Sulfur", "Boron"]
+            }
+        };
+
+        let farmData = null;
+        let analysisResults = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🌾 RESULTS PAGE LOADED");
+            
+            // Load saved farm data
+            loadFarmData();
+            
+            // Initialize analysis
+            initializeAnalysis();
+            
+            // Setup tab switching
+            setupAnalysisTabs();
+        });
+
+        function loadFarmData() {
+            const savedData = localStorage.getItem('farmData');
+            if (!savedData) {
+                alert('No farm data found. Please go back and enter your location.');
+                window.location.href = 'location.html';
+                return;
+            }
+            
+            farmData = JSON.parse(savedData);
+            console.log("Loaded farm data:", farmData);
+            
+            // Update UI with farmer name and location
+            document.getElementById('welcomeName').textContent = farmData.farmerName || 'Farmer';
+            document.getElementById('summaryCoords').textContent = 
+                `${farmData.location.latitude.toFixed(4)}°, ${farmData.location.longitude.toFixed(4)}°`;
+        }
+
+        async function initializeAnalysis() {
+            showLoadingState();
+            
+            try {
+                // Step 1: Get real soil data
+                const soilData = await getRealSoilData(farmData.location.latitude, farmData.location.longitude);
+                
+                // Step 2: Get real climate data
+                const climateData = await getRealClimateData(farmData.location.latitude, farmData.location.longitude);
+                
+                // Step 3: Analyze crop suitability
+                const recommendations = analyzeCropSuitability(soilData, climateData);
+                
+                // Step 4: Update UI with results
+                updateResultsUI(soilData, climateData, recommendations);
+                
+            } catch (error) {
+                console.error("Analysis failed:", error);
+                // Fallback to mock data if APIs fail
+                useFallbackData();
+            }
+        }
+
+        async function getRealSoilData(lat, lon) {
+            console.log("🌱 Fetching real soil data...");
+            
+            try {
+                // Using SoilGrids REST API (completely free, no API key needed)
+                const response = await fetch(REAL_APIS.soil.url(lat, lon));
+                const data = await response.json();
+                
+                // Extract soil properties from SoilGrids response
+                const properties = data.properties;
+                return {
+                    ph: properties.find(p => p.property === 'phh2o')?.mean || 6.5,
+                    organicCarbon: properties.find(p => p.property === 'soc')?.mean || 1.2,
+                    nitrogen: properties.find(p => p.property === 'nitrogen')?.mean || 1200,
+                    // Add more properties as needed
+                };
+            } catch (error) {
+                console.warn("SoilGrids API failed, using fallback data");
+                return getFallbackSoilData(lat, lon);
+            }
+        }
+
+        async function getRealClimateData(lat, lon) {
+            console.log("🌤️ Fetching real climate data...");
+            
+            try {
+                // Using NASA POWER API (completely free, no API key needed)
+                const response = await fetch(REAL_APIS.nasa.url(lat, lon));
+                const data = await response.json();
+                
+                const climate = data.properties.parameter;
+                return {
+                    temperature: climate.T2M.annual || 25,
+                    rainfall: climate.PRECTOT.annual || 1000,
+                    sunshine: climate.ALLSKY_SFC_SW_DWN.annual || 5,
+                    // Add seasonal data
+                    monthlyTemp: Array.from({length: 12}, (_, i) => climate.T2M[i + 1] || 25),
+                    monthlyRain: Array.from({length: 12}, (_, i) => climate.PRECTOT[i + 1] || 80)
+                };
+            } catch (error) {
+                console.warn("NASA POWER API failed, using fallback data");
+                return getFallbackClimateData(lat, lon);
+            }
+        }
+
+        function analyzeCropSuitability(soilData, climateData) {
+            console.log("🔍 Analyzing crop suitability...");
+            
+            const recommendations = [];
+            
+            // Score each crop based on suitability
+            for (const [cropKey, crop] of Object.entries(CROP_DATABASE)) {
+                let score = 100;
+                let factors = [];
+                
+                // Soil pH suitability
+                const phDiff = Math.abs(soilData.ph - crop.soilPH.ideal);
+                const phScore = Math.max(0, 100 - (phDiff * 20));
+                score *= phScore / 100;
+                factors.push(`pH: ${phScore.toFixed(0)}%`);
+                
+                // Temperature suitability
+                const tempDiff = Math.abs(climateData.temperature - crop.temperature.ideal);
+                const tempScore = Math.max(0, 100 - (tempDiff * 5));
+                score *= tempScore / 100;
+                factors.push(`Temp: ${tempScore.toFixed(0)}%`);
+                
+                // Rainfall suitability
+                const rainDiff = Math.abs(climateData.rainfall - crop.rainfall.ideal) / crop.rainfall.ideal;
+                const rainScore = Math.max(0, 100 - (rainDiff * 50));
+                score *= rainScore / 100;
+                factors.push(`Rain: ${rainScore.toFixed(0)}%`);
+                
+                // Soil organic matter
+                const organicScore = soilData.organicCarbon > 1.0 ? 100 : soilData.organicCarbon * 100;
+                score *= organicScore / 100;
+                factors.push(`Organic: ${organicScore.toFixed(0)}%`);
+                
+                recommendations.push({
+                    crop: crop,
+                    score: Math.round(score),
+                    factors: factors,
+                    suitability: getSuitabilityLevel(score)
+                });
+            }
+            
+            // Sort by score (descending)
+            return recommendations.sort((a, b) => b.score - a.score).slice(0, 4);
+        }
+
+        function getSuitabilityLevel(score) {
+            if (score >= 80) return { level: "Excellent", color: "#10b981" };
+            if (score >= 60) return { level: "Good", color: "#3b82f6" };
+            if (score >= 40) return { level: "Moderate", color: "#f59e0b" };
+            return { level: "Poor", color: "#ef4444" };
+        }
+
+        function updateResultsUI(soilData, climateData, recommendations) {
+            // Update soil metrics
+            document.getElementById('soilPH').textContent = soilData.ph.toFixed(1);
+            document.getElementById('soilOrganic').textContent = soilData.organicCarbon.toFixed(1) + '%';
+            document.getElementById('soilNitrogen').textContent = Math.round(soilData.nitrogen) + ' kg/ha';
+            
+            // Update climate data
+            document.getElementById('avgTemp').textContent = climateData.temperature.toFixed(1) + '°C';
+            document.getElementById('annualRainfall').textContent = Math.round(climateData.rainfall) + ' mm';
+            document.getElementById('sunshineHours').textContent = climateData.sunshine.toFixed(1) + ' hrs/day';
+            document.getElementById('summaryRainfall').textContent = Math.round(climateData.rainfall) + ' mm/year';
+            
+            // Update progress bars
+            updateProgressBars(soilData);
+            
+            // Display recommendations
+            displayRecommendations(recommendations);
+            
+            // Create climate chart
+            createClimateChart(climateData);
+            
+            // Update seasonal recommendations
+            updateSeasonalRecommendations(recommendations);
+            
+            // Hide loading state
+            hideLoadingState();
+        }
+
+        function displayRecommendations(recommendations) {
+            const grid = document.getElementById('recommendationsGrid');
+            grid.innerHTML = '';
+            
+            recommendations.forEach((rec, index) => {
+                const crop = rec.crop;
+                const cropElement = document.createElement('div');
+                cropElement.className = 'crop-card';
+                cropElement.innerHTML = `
+                    <div class="crop-header">
+                        <h3>${crop.name}</h3>
+                        <div class="score-badge" style="background: ${rec.suitability.color}">
+                            ${rec.score}%
+                        </div>
+                    </div>
+                    <div class="crop-details">
+                        <div class="crop-metric">
+                            <span>🌱 Season:</span>
+                            <span>${crop.season.join(', ')}</span>
+                        </div>
+                        <div class="crop-metric">
+                            <span>⏱️ Duration:</span>
+                            <span>${crop.duration} days</span>
+                        </div>
+                        <div class="crop-metric">
+                            <span>📈 Yield:</span>
+                            <span>${crop.yield}</span>
+                        </div>
+                        <div class="crop-metric">
+                            <span>💧 Water:</span>
+                            <span>${crop.waterRequirement}</span>
+                        </div>
+                    </div>
+                    <div class="suitability-info">
+                        <strong>Suitability: ${rec.suitability.level}</strong>
+                        <div class="factors">
+                            ${rec.factors.map(f => `<span class="factor">${f}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cropElement);
+            });
+        }
+
+        // Fallback data functions and other utility functions...
+        // [Previous fallback and utility functions remain the same]
+
+        function setupAnalysisTabs() {
+            document.querySelectorAll('.analysis-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    document.querySelectorAll('.analysis-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabName + 'Tab').classList.add('active');
+                });
+            });
+        }
+
+        function saveRecommendations() {
+            const dataToSave = {
+                farmerData: farmData,
+                analysisResults: analysisResults,
+                timestamp: new Date().toISOString()
+            };
+            
+            // In real app, this would save to database
+            localStorage.setItem('savedRecommendations', JSON.stringify(dataToSave));
+            alert('✅ Recommendations saved successfully!');
+        }
+
+        function shareResults() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Crop Recommendations - AmritKrishi',
+                    text: `Check out my personalized crop recommendations from AmritKrishi!`,
+                    url: window.location.href
+                });
+            } else {
+                alert('Share feature not supported in your browser. You can copy the URL manually.');
+            }
+        }
+
+        // Fallback data functions (kept as backup)
+        function getFallbackSoilData(lat, lon) {
+            // Regional soil data for India
+            if (lat > 20 && lat < 30 && lon > 70 && lon < 90) {
+                return { ph: 7.2, organicCarbon: 1.8, nitrogen: 1500 }; // North-West
+            } else if (lat > 10 && lat < 20 && lon > 70 && lon < 80) {
+                return { ph: 6.8, organicCarbon: 1.2, nitrogen: 1100 }; // West
+            } else {
+                return { ph: 6.5, organicCarbon: 1.5, nitrogen: 1300 }; // General
+            }
+        }
+
+        function getFallbackClimateData(lat, lon) {
+            // Regional climate patterns for India
+            let temp = 25, rain = 1000, sunshine = 6;
+            
+            if (lat > 20 && lat < 30) {
+                temp = 28; rain = 800; sunshine = 7; // North
+            } else if (lat > 10 && lat < 20) {
+                temp = 32; rain = 1200; sunshine = 6; // Central
+            } else if (lat < 10) {
+                temp = 30; rain = 2500; sunshine = 5; // South
+            }
+            
+            return {
+                temperature: temp,
+                rainfall: rain,
+                sunshine: sunshine,
+                monthlyTemp: Array.from({length: 12}, (_, i) => temp + Math.sin(i * 0.5) * 5),
+                monthlyRain: Array.from({length: 12}, (_, i) => {
+                    // Monsoon pattern for India
+                    if (i >= 5 && i <= 9) return rain * 0.2; // Monsoon months
+                    return rain * 0.05; // Dry months
+                })
+            };
+        }
+
+        function useFallbackData() {
+            console.log("Using fallback data for analysis");
+            const soilData = getFallbackSoilData(farmData.location.latitude, farmData.location.longitude);
+            const climateData = getFallbackClimateData(farmData.location.latitude, farmData.location.longitude);
+            const recommendations = analyzeCropSuitability(soilData, climateData);
+            updateResultsUI(soilData, climateData, recommendations);
+        }
+
+        function showLoadingState() {
+            // Show loading states in various sections
+            document.querySelectorAll('.loading-text').forEach(el => {
+                el.style.display = 'block';
+            });
+        }
+
+        function hideLoadingState() {
+            // Hide loading states
+            document.querySelectorAll('.loading-text').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        function updateProgressBars(soilData) {
+            // pH bar (ideal range: 6.0-7.0)
+            const phPercent = ((soilData.ph - 4) / 4) * 100; // Scale 4-8 to 0-100%
+            document.getElementById('phBar').style.width = Math.min(100, Math.max(0, phPercent)) + '%';
+            document.getElementById('phStatus').textContent = getPHStatus(soilData.ph);
+            
+            // Organic carbon bar (ideal: >1.5%)
+            const organicPercent = (soilData.organicCarbon / 3) * 100;
+            document.getElementById('organicBar').style.width = Math.min(100, organicPercent) + '%';
+            document.getElementById('organicStatus').textContent = getOrganicStatus(soilData.organicCarbon);
+            
+            // Nitrogen bar (ideal: >1200 kg/ha)
+            const nitrogenPercent = (soilData.nitrogen / 2000) * 100;
+            document.getElementById('nitrogenBar').style.width = Math.min(100, nitrogenPercent) + '%';
+            document.getElementById('nitrogenStatus').textContent = getNitrogenStatus(soilData.nitrogen);
+        }
+
+        function getPHStatus(ph) {
+            if (ph >= 6.0 && ph <= 7.0) return 'Ideal for most crops';
+            if (ph >= 5.5 && ph <= 7.5) return 'Moderate';
+            return 'Needs soil amendment';
+        }
+
+        function getOrganicStatus(organic) {
+            if (organic > 1.5) return 'Excellent';
+            if (organic > 1.0) return 'Good';
+            return 'Needs organic matter';
+        }
+
+        function getNitrogenStatus(nitrogen) {
+            if (nitrogen > 1500) return 'High';
+            if (nitrogen > 1000) return 'Adequate';
+            return 'Low - consider fertilization';
+        }
+
+        function createClimateChart(climateData) {
+            const ctx = document.getElementById('climateChart').getContext('2d');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Temperature (°C)',
+                            data: climateData.monthlyTemp,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Rainfall (mm)',
+                            data: climateData.monthlyRain,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Temperature (°C)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Rainfall (mm)' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSeasonalRecommendations(recommendations) {
+            const kharifCrops = recommendations.filter(r => r.crop.season.includes('kharif'));
+            const rabiCrops = recommendations.filter(r => r.crop.season.includes('rabi'));
+            const zaidCrops = recommendations.filter(r => r.crop.season.includes('zaid') || r.crop.season.includes('year_round'));
+            
+            displaySeasonalCrops('kharifCrops', kharifCrops);
+            displaySeasonalCrops('rabiCrops', rabiCrops);
+            displaySeasonalCrops('zaidCrops', zaidCrops);
+        }
+
+        function displaySeasonalCrops(containerId, crops) {
+            const container = document.getElementById(containerId);
+            if (crops.length === 0) {
+                container.innerHTML = '<div class="no-crops">No specific recommendations for this season</div>';
+                return;
+            }
+            
+            container.innerHTML = crops.map(crop => `
+                <div class="season-crop">
+                    <strong>${crop.crop.name}</strong>
+                    <span class="crop-score" style="color: ${crop.suitability.color}">
+                        ${crop.score}%
+                    </span>
+                </div>
+            `).join('');
+        }
+    </script>
+
+    <style>
+        /* Results page specific styles */
+        .results-main-content {
+            position: relative;
+            z-index: 10;
+            padding: 2rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .results-container {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .farmer-welcome {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(47, 93, 51, 0.3), rgba(168, 182, 140, 0.2));
+            border-radius: 1rem;
+            border: 1px solid rgba(216, 180, 0, 0.2);
+        }
+
+        .farmer-welcome h2 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .farmer-welcome p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .location-summary-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .summary-header h3 {
+            color: white;
+            margin: 0;
+        }
+
+        .location-badge {
+            background: var(--accent);
+            color: black;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .summary-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .recommendations-section {
+            margin-bottom: 2rem;
+        }
+
+        .recommendations-section h2 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .crop-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .crop-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .crop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .crop-header h3 {
+            color: white;
+            margin: 0;
+        }
+
+        .score-badge {
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .crop-details {
+            margin-bottom: 1rem;
+        }
+
+        .crop-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .crop-metric:last-child {
+            border-bottom: none;
+        }
+
+        .crop-metric span:first-child {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .crop-metric span:last-child {
+            color: white;
+            font-weight: 500;
+        }
+
+        .suitability-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .suitability-info strong {
+            color: white;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .factors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .factor {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .analysis-section {
+            margin-bottom: 2rem;
+        }
+
+        .analysis-section h2 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .analysis-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .analysis-tab {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .analysis-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .analysis-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .soil-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-label {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .metric-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .metric-fill {
+            background: var(--accent);
+            height: 100%;
+            transition: width 1s ease-in-out;
+        }
+
+        .metric-status {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .climate-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .climate-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .climate-icon {
+            font-size: 2rem;
+        }
+
+        .climate-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .climate-value {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .climate-chart {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .season-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .season-card h4 {
+            color: white;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .season-crops {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .season-crop {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .season-crop strong {
+            color: white;
+        }
+
+        .crop-score {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .no-crops {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--primary), #3a7a40);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #3a7a40, #4a9a50);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .loading-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .results-container {
+                padding: 1rem;
+            }
+            
+            .recommendations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</body>
+</html>

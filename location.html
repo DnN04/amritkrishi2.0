@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Location - AmritKrishi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Background -->
+        <div class="background-image">
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Navigation Header -->
+        <nav class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text" data-i18n="navTitle">AmritKrishi</span>
+                </a>
+                <div class="nav-links">
+                    <button class="nav-link" data-i18n="navFeatures">Features</button>
+                    <button class="nav-link" data-i18n="navLanguage">Language</button>
+                    <button class="nav-link" data-i18n="navAbout">About</button>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="current-language-display">
+                    <span id="currentLangDisplay">English</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Location Input Content -->
+        <div class="location-main-content">
+            <div class="location-container">
+                <!-- Progress Indicator -->
+                <div class="progress-indicator">
+                    <div class="progress-step active">
+                        <div class="step-number">1</div>
+                        <span class="step-text" data-i18n="stepLocation">Location</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">2</div>
+                        <span class="step-text" data-i18n="stepAnalysis">Analysis</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div>
+                        <span class="step-text" data-i18n="stepResults">Results</span>
+                    </div>
+                </div>
+
+                <!-- Main Form -->
+                <div class="location-form-container">
+                    <h2 class="form-title" data-i18n="formTitle">Enter Your Farm Location</h2>
+                    <p class="form-subtitle" data-i18n="formSubtitle">We'll analyze soil and climate to recommend the best crops</p>
+
+                    <form class="location-form" id="locationForm">
+                        <!-- Name Input -->
+                        <div class="form-group">
+                            <label for="farmerName" class="form-label" data-i18n="labelName">Your Name</label>
+                            <input type="text" id="farmerName" class="form-input" placeholder="Enter your name" required>
+                        </div>
+
+                        <!-- Location Method Selection -->
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="labelMethod">Choose Location Method</label>
+                            <div class="method-buttons">
+                                <button type="button" class="method-btn active" data-method="gps" id="gpsBtn">
+                                    <span class="method-icon">📍</span>
+                                    <span>Current Location</span>
+                                </button>
+                                <button type="button" class="method-btn" data-method="search" id="searchBtn">
+                                    <span class="method-icon">🔍</span>
+                                    <span>Search Place</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- GPS Location Section -->
+                        <div class="method-section active" id="gpsSection">
+                            <div class="gps-instructions">
+                                <p>Click the button below to automatically detect your location</p>
+                                <button type="button" class="gps-detect-btn" id="detectLocationBtn">
+                                    <span class="gps-icon">🌐</span>
+                                    Detect My Location
+                                </button>
+                            </div>
+                            
+                            <div class="location-result" id="gpsResult" style="display: none;">
+                                <div class="location-success">
+                                    <span class="success-icon">✅</span>
+                                    <div class="location-details">
+                                        <strong>Location Detected!</strong>
+                                        <div id="gpsCoordinates">Latitude: --, Longitude: --</div>
+                                        <div id="gpsAddress">Address: Detecting...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Search Location Section -->
+                        <div class="method-section" id="searchSection">
+                            <div class="search-container">
+                                <div class="search-input-group">
+                                    <input type="text" id="searchInput" class="search-input" 
+                                           placeholder="Enter city, village, or area name..." 
+                                           autocomplete="off">
+                                    <button type="button" class="search-btn" id="searchLocationBtn">
+                                        <span class="search-icon">🔍</span>
+                                        Search
+                                    </button>
+                                </div>
+                                
+                                <div class="search-suggestions" id="searchSuggestions">
+                                    <div class="suggestion-header">Popular Indian Locations:</div>
+                                    <div class="suggestions-grid">
+                                        <div class="suggestion-item" data-place="Delhi, India">Delhi</div>
+                                        <div class="suggestion-item" data-place="Mumbai, India">Mumbai</div>
+                                        <div class="suggestion-item" data-place="Bangalore, India">Bangalore</div>
+                                        <div class="suggestion-item" data-place="Chennai, India">Chennai</div>
+                                        <div class="suggestion-item" data-place="Kolkata, India">Kolkata</div>
+                                        <div class="suggestion-item" data-place="Hyderabad, India">Hyderabad</div>
+                                        <div class="suggestion-item" data-place="Pune, India">Pune</div>
+                                        <div class="suggestion-item" data-place="Ahmedabad, India">Ahmedabad</div>
+                                        <div class="suggestion-item" data-place="Jaipur, India">Jaipur</div>
+                                        <div class="suggestion-item" data-place="Lucknow, India">Lucknow</div>
+                                        <div class="suggestion-item" data-place="Chandigarh, India">Chandigarh</div>
+                                        <div class="suggestion-item" data-place="Bhopal, India">Bhopal</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="search-results" id="searchResults" style="display: none;">
+                                    <div class="results-header">Search Results:</div>
+                                    <div class="results-list" id="resultsList"></div>
+                                </div>
+                                
+                                <div class="selected-search-result" id="selectedSearchResult" style="display: none;">
+                                    <div class="location-success">
+                                        <span class="success-icon">✅</span>
+                                        <div class="location-details">
+                                            <strong>Location Selected!</strong>
+                                            <div id="searchCoordinates">Latitude: --, Longitude: --</div>
+                                            <div id="searchAddress">Address: --</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selected Location Display -->
+                        <div class="selected-location" id="selectedLocation" style="display: none;">
+                            <div class="location-display">
+                                <span class="location-icon">📌</span>
+                                <div class="location-info">
+                                    <strong>Selected Location:</strong>
+                                    <div id="locationText">No location selected</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                            <span data-i18n="btnAnalyze">Analyze My Farm</span>
+                            <span class="loading-spinner" style="display: none;">⏳</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INCLUDE SHARED LANGUAGE SYSTEM -->
+    <script src="js/shared-language.js"></script>
+    
+    <script>
+        // Location page functionality
+        let currentMethod = 'gps';
+        let selectedLocation = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("📍 LOCATION PAGE LOADED");
+            initializeLocationPage();
+        });
+
+        function initializeLocationPage() {
+            // Method selection
+            document.getElementById('gpsBtn').addEventListener('click', () => setActiveMethod('gps'));
+            document.getElementById('searchBtn').addEventListener('click', () => setActiveMethod('search'));
+            
+            // GPS detection
+            document.getElementById('detectLocationBtn').addEventListener('click', detectLocation);
+            
+            // Search functionality
+            document.getElementById('searchLocationBtn').addEventListener('click', searchLocation);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchLocation();
+                }
+            });
+            
+            // Quick suggestions
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const place = this.getAttribute('data-place');
+                    document.getElementById('searchInput').value = place;
+                    searchLocation();
+                });
+            });
+            
+            // Form submission
+            document.getElementById('locationForm').addEventListener('submit', handleFormSubmit);
+            
+            // Name input validation
+            document.getElementById('farmerName').addEventListener('input', updateSubmitButton);
+        }
+
+        function setActiveMethod(method) {
+            currentMethod = method;
+            
+            // Update active button
+            document.getElementById('gpsBtn').classList.toggle('active', method === 'gps');
+            document.getElementById('searchBtn').classList.toggle('active', method === 'search');
+            
+            // Show/hide sections
+            document.getElementById('gpsSection').classList.toggle('active', method === 'gps');
+            document.getElementById('searchSection').classList.toggle('active', method === 'search');
+            
+            // Reset selection
+            selectedLocation = null;
+            updateSubmitButton();
+            hideSelectedLocation();
+            
+            // Clear search results when switching to search
+            if (method === 'search') {
+                clearSearchResults();
+            }
+        }
+
+        function detectLocation() {
+            const btn = document.getElementById('detectLocationBtn');
+            const result = document.getElementById('gpsResult');
+            
+            btn.innerHTML = '<span class="gps-icon">🌐</span> Detecting...';
+            btn.disabled = true;
+            
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser. Please use search method.');
+                resetGPSButton();
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Show success
+                    document.getElementById('gpsCoordinates').textContent = 
+                        `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
+                    
+                    // Get address
+                    getAddressFromCoords(lat, lng, 'gps');
+                    
+                    // Set selected location
+                    selectedLocation = {
+                        latitude: lat,
+                        longitude: lng,
+                        method: 'gps'
+                    };
+                    
+                    result.style.display = 'block';
+                    showSelectedLocation(`GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+                    updateSubmitButton();
+                    resetGPSButton();
+                },
+                function(error) {
+                    let errorMessage = 'Unable to detect your location. ';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Please allow location access and try again.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += 'Location request timed out.';
+                            break;
+                        default:
+                            errorMessage += 'An unknown error occurred.';
+                    }
+                    
+                    alert(errorMessage);
+                    resetGPSButton();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
+
+        function searchLocation() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput.value.trim();
+            const searchBtn = document.getElementById('searchLocationBtn');
+            
+            if (!searchTerm) {
+                alert('Please enter a location to search.');
+                return;
+            }
+            
+            searchBtn.innerHTML = '<span class="search-icon">🔍</span> Searching...';
+            searchBtn.disabled = true;
+            
+            // Clear previous results
+            clearSearchResults();
+            
+            // Simulate API call to geocoding service
+            setTimeout(() => {
+                const mockResults = generateMockSearchResults(searchTerm);
+                displaySearchResults(mockResults);
+                
+                searchBtn.innerHTML = '<span class="search-icon">🔍</span> Search';
+                searchBtn.disabled = false;
+            }, 1500);
+        }
+
+        function generateMockSearchResults(searchTerm) {
+            // Mock data for demonstration - in real app, use Google Maps Geocoding API
+            const baseResults = [
+                {
+                    name: `${searchTerm}, India`,
+                    lat: 28.6139 + (Math.random() - 0.5) * 0.1,
+                    lng: 77.2090 + (Math.random() - 0.5) * 0.1,
+                    type: 'city'
+                },
+                {
+                    name: `${searchTerm} District, India`,
+                    lat: 28.6139 + (Math.random() - 0.5) * 0.2,
+                    lng: 77.2090 + (Math.random() - 0.5) * 0.2,
+                    type: 'administrative'
+                },
+                {
+                    name: `${searchTerm} Rural Area, India`,
+                    lat: 28.6139 + (Math.random() - 0.5) * 0.3,
+                    lng: 77.2090 + (Math.random() - 0.5) * 0.3,
+                    type: 'village'
+                }
+            ];
+            
+            return baseResults;
+        }
+
+        function displaySearchResults(results) {
+            const resultsList = document.getElementById('resultsList');
+            const searchResults = document.getElementById('searchResults');
+            
+            resultsList.innerHTML = '';
+            
+            if (results.length === 0) {
+                resultsList.innerHTML = '<div class="no-results">No locations found. Try a different search term.</div>';
+            } else {
+                results.forEach((result, index) => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <div class="result-main">
+                            <strong>${result.name}</strong>
+                            <span class="result-type">${result.type}</span>
+                        </div>
+                        <div class="result-coords">
+                            ${result.lat.toFixed(4)}°, ${result.lng.toFixed(4)}°
+                        </div>
+                        <button class="select-result-btn" data-index="${index}">Select</button>
+                    `;
+                    resultsList.appendChild(resultItem);
+                });
+                
+                // Add event listeners to select buttons
+                document.querySelectorAll('.select-result-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        selectSearchResult(results[index]);
+                    });
+                });
+            }
+            
+            searchResults.style.display = 'block';
+        }
+
+        function selectSearchResult(result) {
+            const selectedResult = document.getElementById('selectedSearchResult');
+            
+            // Update display
+            document.getElementById('searchCoordinates').textContent = 
+                `Latitude: ${result.lat.toFixed(6)}, Longitude: ${result.lng.toFixed(6)}`;
+            document.getElementById('searchAddress').textContent = `Address: ${result.name}`;
+            
+            // Set selected location
+            selectedLocation = {
+                latitude: result.lat,
+                longitude: result.lng,
+                method: 'search',
+                address: result.name
+            };
+            
+            selectedResult.style.display = 'block';
+            showSelectedLocation(`Search: ${result.name}`);
+            updateSubmitButton();
+            
+            // Hide search results
+            document.getElementById('searchResults').style.display = 'none';
+        }
+
+        function clearSearchResults() {
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('selectedSearchResult').style.display = 'none';
+            document.getElementById('resultsList').innerHTML = '';
+        }
+
+        function getAddressFromCoords(lat, lng, method) {
+            // Simulated address lookup
+            const addressElement = method === 'gps' ? 
+                document.getElementById('gpsAddress') : 
+                document.getElementById('searchAddress');
+                
+            addressElement.textContent = 'Address: Looking up...';
+            
+            setTimeout(() => {
+                const addresses = [
+                    'Agricultural land detected',
+                    'Rural area identified', 
+                    'Farmland location confirmed',
+                    'Agricultural zone recognized',
+                    'Farming region located'
+                ];
+                const randomAddress = addresses[Math.floor(Math.random() * addresses.length)];
+                addressElement.textContent = `Area: ${randomAddress}`;
+            }, 1500);
+        }
+
+        function resetGPSButton() {
+            const btn = document.getElementById('detectLocationBtn');
+            btn.innerHTML = '<span class="gps-icon">🌐</span> Detect My Location';
+            btn.disabled = false;
+        }
+
+        function showSelectedLocation(text) {
+            document.getElementById('locationText').textContent = text;
+            document.getElementById('selectedLocation').style.display = 'block';
+        }
+
+        function hideSelectedLocation() {
+            document.getElementById('selectedLocation').style.display = 'none';
+        }
+
+        function updateSubmitButton() {
+            const farmerName = document.getElementById('farmerName').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = !(selectedLocation && farmerName);
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const farmerName = document.getElementById('farmerName').value.trim();
+            
+            if (!selectedLocation || !farmerName) {
+                alert('Please provide both your name and location.');
+                return;
+            }
+            
+            // Save data
+            const formData = {
+                farmerName: farmerName,
+                location: selectedLocation,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('farmData', JSON.stringify(formData));
+            
+            // Show loading
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            const btnText = submitBtn.querySelector('span:first-child');
+            
+            btnText.textContent = 'Analyzing Soil & Climate...';
+            spinner.style.display = 'inline';
+            submitBtn.disabled = true;
+            
+            // Simulate analysis and redirect
+            setTimeout(() => {
+                window.location.href = 'results.html';
+            }, 3000);
+        }
+    </script>
+
+    <style>
+        /* Additional styles for location methods */
+        .method-section {
+            display: none;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .method-section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .gps-instructions {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .gps-instructions p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        .gps-detect-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #2f5d33, #3a7a40);
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gps-detect-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #3a7a40, #4a9a50);
+            transform: translateY(-2px);
+        }
+
+        .gps-detect-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .gps-icon {
+            font-size: 1.2rem;
+        }
+
+        .location-result {
+            margin-top: 1rem;
+        }
+
+        .location-success {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(47, 93, 51, 0.2);
+            border: 1px solid rgba(216, 180, 0, 0.3);
+            border-radius: 0.5rem;
+        }
+
+        .success-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Search Styles */
+        .search-container {
+            width: 100%;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #d8b400, #e5c34d);
+            border: none;
+            border-radius: 0.5rem;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #e5c34d, #f2d27a);
+            transform: translateY(-2px);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .search-suggestions {
+            margin-bottom: 1.5rem;
+        }
+
+        .suggestion-header {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .suggestion-item {
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.375rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .search-results {
+            margin: 1rem 0;
+        }
+
+        .results-header {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-main {
+            flex: 1;
+        }
+
+        .result-type {
+            font-size: 0.8rem;
+            color: var(--accent);
+            background: rgba(216, 180, 0, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+        }
+
+        .result-coords {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0 1rem;
+        }
+
+        .select-result-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 0.375rem;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .select-result-btn:hover {
+            background: #3a7a40;
+        }
+
+        .no-results {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 2rem;
+        }
+
+        .selected-search-result {
+            margin-top: 1rem;
+        }
+
+        .selected-location {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(47, 93, 51, 0.2);
+            border: 1px solid rgba(216, 180, 0, 0.3);
+            border-radius: 0.5rem;
+        }
+
+        .location-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .location-icon {
+            font-size: 1.5rem;
+        }
+
+        .location-info {
+            flex: 1;
+        }
+
+        .location-info strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body>
+</html>

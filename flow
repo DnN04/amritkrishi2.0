@@ -1,0 +1,15 @@
+amrit-krishi-frontend/
+├── index.html
+├── location.html
+├── results.html
+├── css/
+│   ├── style.css
+│   └── animations.css
+├── js/
+│   ├── shared-language.js
+│   ├── language.js
+│   ├── location.js
+│   └── results.js
+└── assets/
+    └── images/
+        └── wheat-field.jpg

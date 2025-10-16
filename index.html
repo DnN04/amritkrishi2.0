@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmritKrishi - Technology with Tradition</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="min-h-screen relative overflow-hidden">
+        <div class="background-image">
+            <div class="overlay"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tagline -->
+            <div class="tagline animate-slide-in-left">
+                <p id="taglineText">Revolutionizing Agriculture with Smart Technology</p>
+            </div>
+
+            <!-- Main Title -->
+            <div class="title-container">
+                <h1 class="main-title" id="mainTitle">AmritKrishi</h1>
+            </div>
+
+            <!-- Subtitle -->
+            <div class="subtitle animate-fade-in-up">
+                <p id="subtitleText">A smart revolutionary tech solution to enhance our agriculture with traditional wisdom</p>
+            </div>
+
+            <!-- Language Selection -->
+            <div class="get-started-container">
+                <div class="language-selector">
+                    <span class="get-started-text">Get Started in</span>
+                    <div class="language-dropdown-container">
+                        <button class="language-btn" id="languageBtn">
+                            <span class="current-language" id="currentLanguage">English</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <button class="dropdown-item" onclick="selectLanguage('en')">English</button>
+                            <button class="dropdown-item" onclick="selectLanguage('hi')">हिंदी</button>
+                            <button class="dropdown-item" onclick="selectLanguage('pa')">ਪੰਜਾਬੀ</button>
+                            <button class="dropdown-item" onclick="selectLanguage('or')">ଓଡ଼ିଆ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INCLUDE SHARED LANGUAGE SYSTEM -->
+    <script src="js/shared-language.js"></script>
+
+    <script>
+        // Landing page specific functions
+        const LANDING_TRANSLATIONS = {
+            en: {
+                tagline: "Revolutionizing Agriculture with Smart Technology",
+                title: "AmritKrishi", 
+                subtitle: "A smart revolutionary tech solution to enhance our agriculture with traditional wisdom",
+                getStarted: "Get Started in"
+            },
+            hi: {
+                tagline: "स्मार्ट तकनीक के साथ कृषि क्रांति",
+                title: "अमृतकृषि",
+                subtitle: "पारंपरिक ज्ञान के साथ हमारी कृषि को बढ़ाने के लिए एक स्मार्ट क्रांतिकारी तकनीक समाधान",
+                getStarted: "शुरू करें"
+            },
+            pa: {
+                tagline: "ਸਮਾਰਟ ਟੈਕਨਾਲੋਜੀ ਨਾਲ ਖੇਤੀ ਵਿੱਚ ਕ੍ਰਾਂਤੀ",
+                title: "ਅੰਮ੍ਰਿਤ ਕ੍ਰਿਸ਼ੀ",
+                subtitle: "ਸਾਡੀ ਖੇਤੀ ਨੂੰ ਬਿਹਤਰ ਬਣਾਉਣ ਲਈ ਇੱਕ ਸਮਾਰਟ ਕ੍ਰਾਂਤੀਕਾਰੀ ਟੈਕਨਾਲੋਜੀ ਹੱਲ",
+                getStarted: "ਸ਼ੁਰੂ ਕਰੋ"
+            },
+            or: {
+                tagline: "ସ୍ମାର୍ଟ ଟେକ୍ନୋଲୋଜି ସହିତ କୃଷିରେ ବିପ୍ଳବ",
+                title: "ଅମୃତକୃଷି", 
+                subtitle: "ଆମର କୃଷି ବ enhance ାଇବା ପାଇଁ ଏକ ସ୍ମାର୍ଟ ବିପ୍ଳବୀ ଟେକ୍ ସମାଧାନ",
+                getStarted: "ଆରମ୍ଭ କରନ୍ତୁ"
+            }
+        };
+
+        const languages = ['English', 'हिंदी', 'ਪੰਜਾਬੀ', 'ଓଡ଼ିଆ'];
+        let currentLangIndex = 0;
+        let isDropdownOpen = false;
+
+        function selectLanguage(langCode) {
+            console.log("🎯 LANGUAGE SELECTED:", langCode);
+            
+            // Update landing page text immediately
+            document.getElementById('taglineText').textContent = LANDING_TRANSLATIONS[langCode].tagline;
+            document.getElementById('mainTitle').textContent = LANDING_TRANSLATIONS[langCode].title;
+            document.getElementById('subtitleText').textContent = LANDING_TRANSLATIONS[langCode].subtitle;
+            document.getElementById('currentLanguage').textContent = languages[getLangIndex(langCode)];
+            
+            // Save to shared system
+            setAppLanguage(langCode);
+            
+            // Close dropdown
+            closeDropdown();
+            
+            // Redirect to location page
+            setTimeout(() => {
+                console.log("🔄 REDIRECTING TO LOCATION PAGE");
+                window.location.href = 'location.html';
+            }, 500);
+        }
+
+        function getLangIndex(langCode) {
+            const codes = ['en', 'hi', 'pa', 'or'];
+            return codes.indexOf(langCode);
+        }
+
+        function toggleDropdown() {
+            isDropdownOpen = !isDropdownOpen;
+            const dropdown = document.getElementById('dropdownMenu');
+            const arrow = document.querySelector('.dropdown-arrow');
+            
+            if (isDropdownOpen) {
+                dropdown.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function closeDropdown() {
+            isDropdownOpen = false;
+            document.getElementById('dropdownMenu').style.display = 'none';
+            document.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+        }
+
+        // Auto-scroll languages
+        function startLanguageScroll() {
+            setInterval(() => {
+                if (!isDropdownOpen) {
+                    currentLangIndex = (currentLangIndex + 1) % languages.length;
+                    document.getElementById('currentLanguage').textContent = languages[currentLangIndex];
+                }
+            }, 2000);
+        }
+
+        // Initialize landing page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🏠 LANDING PAGE LOADED");
+            
+            // Set up dropdown button
+            document.getElementById('languageBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                closeDropdown();
+            });
+            
+            // Start auto-scroll
+            startLanguageScroll();
+            
+            // Show title with animation
+            setTimeout(() => {
+                document.querySelector('.title-container').style.opacity = '1';
+            }, 500);
+        });
+
+        // Prevent dropdown close when clicking inside dropdown
+        document.getElementById('dropdownMenu').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>
