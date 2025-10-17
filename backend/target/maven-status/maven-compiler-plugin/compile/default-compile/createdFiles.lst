@@ -1,0 +1,14 @@
+com\amritkrishi\model\ClimateData.class
+com\amritkrishi\model\SoilAnalysis.class
+com\amritkrishi\repository\SoilAnalysisRepository.class
+com\amritkrishi\model\Farmer.class
+com\amritkrishi\repository\ClimateDataRepository.class
+com\amritkrishi\repository\CropRecommendationRepository.class
+com\amritkrishi\service\AnalysisService$CropData.class
+com\amritkrishi\controller\AnalysisController.class
+com\amritkrishi\model\CropRecommendation.class
+com\amritkrishi\service\FarmerService.class
+com\amritkrishi\repository\FarmerRepository.class
+com\amritkrishi\service\AnalysisService.class
+com\amritkrishi\AmritKrishiApplication.class
+com\amritkrishi\controller\FarmerController.class

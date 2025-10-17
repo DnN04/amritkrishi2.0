@@ -199,7 +199,7 @@
                         ← Analyze Another Location
                     </button>
                     <button class="action-btn primary" onclick="saveRecommendations()">
-                        💾 Save Recommendations
+                            💾 Save Recommendations
                     </button>
                     <button class="action-btn primary" onclick="shareResults()">
                         📤 Share Results
@@ -367,44 +367,218 @@
         });
 
         function loadFarmData() {
-            const savedData = localStorage.getItem('farmData');
-            if (!savedData) {
-                alert('No farm data found. Please go back and enter your location.');
-                window.location.href = 'location.html';
-                return;
-            }
-            
-            farmData = JSON.parse(savedData);
-            console.log("Loaded farm data:", farmData);
-            
-            // Update UI with farmer name and location
-            document.getElementById('welcomeName').textContent = farmData.farmerName || 'Farmer';
-            document.getElementById('summaryCoords').textContent = 
-                `${farmData.location.latitude.toFixed(4)}°, ${farmData.location.longitude.toFixed(4)}°`;
+    console.log("🔍 Loading farm data from storage...");
+    
+    // Check ALL possible data sources
+    const analysisResultsData = localStorage.getItem('analysisResults');
+    const farmDataStorage = localStorage.getItem('farmData');
+    const locationData = localStorage.getItem('locationData'); // NEW: Direct coordinates
+    
+    console.log("📦 Available data:", {
+        analysisResults: !!analysisResultsData,
+        farmData: !!farmDataStorage, 
+        locationData: !!locationData
+    });
+    
+    let coordinates = null;
+    let farmerName = "Farmer";
+    
+    // Priority 1: Use direct location data (most reliable)
+    if (locationData) {
+        console.log("✅ Using direct location data");
+        const locData = JSON.parse(locationData);
+        coordinates = {
+            latitude: locData.latitude,
+            longitude: locData.longitude
+        };
+        farmerName = locData.farmerName || "Farmer";
+    }
+    // Priority 2: Use backend analysis results
+    else if (analysisResultsData) {
+        console.log("✅ Using backend analysis results");
+        const results = JSON.parse(analysisResultsData);
+        
+        // Extract coordinates from backend response
+        if (results.latitude && results.longitude) {
+            coordinates = {
+                latitude: results.latitude,
+                longitude: results.longitude
+            };
+        } else if (results.soilAnalysis && results.soilAnalysis.latitude) {
+            coordinates = {
+                latitude: results.soilAnalysis.latitude,
+                longitude: results.soilAnalysis.longitude
+            };
         }
+        
+        farmerName = results.farmerName || "Farmer";
+        analysisResults = results;
+    }
+    // Priority 3: Use old farm data
+    else if (farmDataStorage) {
+        console.log("⚠️ Using old farm data");
+        const farmDataObj = JSON.parse(farmDataStorage);
+        farmData = farmDataObj;
+        
+        if (farmDataObj.location) {
+            coordinates = {
+                latitude: farmDataObj.location.latitude,
+                longitude: farmDataObj.location.longitude
+            };
+        }
+        farmerName = farmDataObj.farmerName || "Farmer";
+    }
+    // No data found
+    else {
+        alert('No farm data found. Please go back and enter your location.');
+        window.location.href = 'location.html';
+        return;
+    }
+    
+    // If no coordinates found, use defaults (shouldn't happen)
+    if (!coordinates) {
+        console.warn("❌ No coordinates found, using defaults");
+        coordinates = {
+            latitude: 28.6139, // Delhi
+            longitude: 77.2090
+        };
+    }
+    
+    console.log("🎯 Final coordinates:", coordinates);
+    console.log("👨‍🌾 Farmer name:", farmerName);
+    
+    // Update UI
+    document.getElementById('welcomeName').textContent = farmerName;
+    document.getElementById('summaryCoords').textContent = 
+        `${coordinates.latitude.toFixed(4)}°, ${coordinates.longitude.toFixed(4)}°`;
+    
+    // Store coordinates for analysis
+    farmData = {
+        farmerName: farmerName,
+        location: coordinates
+    };
+}
 
-        async function initializeAnalysis() {
+// function loadFarmData() {
+//     // FIRST check if we have backend analysis results
+//     const analysisResultsData = localStorage.getItem('analysisResults');
+//     const farmDataStorage = localStorage.getItem('farmData');
+    
+//     if (analysisResultsData) {
+//         // Data from backend
+//         console.log("✅ Using backend analysis results");
+//         const results = JSON.parse(analysisResultsData);
+//         farmData = {
+//             farmerName: results.farmerName || "Farmer",
+//             location: {
+//                 latitude: results.latitude || 28.6139,
+//                 longitude: results.longitude || 77.2090
+//             }
+//         };
+//         analysisResults = results;
+//     } else if (farmDataStorage) {
+//         // Fallback data (old method)
+//         console.log("⚠️ Using fallback farm data");
+//         farmData = JSON.parse(farmDataStorage);
+//         analysisResults = null;
+//     } else {
+//         alert('No farm data found. Please go back and enter your location.');
+//         window.location.href = 'location.html';
+//         return;
+//     }
+    
+//     console.log("Loaded data:", { farmData, analysisResults });
+    
+//     // Update UI with farmer name and location
+//     document.getElementById('welcomeName').textContent = farmData.farmerName || 'Farmer';
+    
+//     if (analysisResults && analysisResults.region) {
+//         document.getElementById('locationName').textContent = analysisResults.region;
+//         document.getElementById('locationType').textContent = analysisResults.region;
+//     } else {
+//         document.getElementById('locationName').textContent = "your location";
+//         document.getElementById('locationType').textContent = "Agricultural Zone";
+//     }
+    
+//     if (farmData.location) {
+//         document.getElementById('summaryCoords').textContent = 
+//             `${farmData.location.latitude.toFixed(4)}°, ${farmData.location.longitude.toFixed(4)}°`;
+//     }
+// }
+
+        // async function initializeAnalysis() {
+        //     showLoadingState();
+            
+        //     try {
+        //         console.log("🔍 Starting analysis...");
+                
+        //         // Check if we have backend results
+        //         const savedResults = localStorage.getItem('analysisResults');
+                
+        //         if (savedResults) {
+        //             console.log("🎯 USING BACKEND DATA");
+        //             const backendData = JSON.parse(savedResults);
+        //             console.log("📊 Backend Data:", backendData);
+                    
+        //             // FORCE using backend data - don't fall back to frontend analysis
+        //             if (backendData.soilAnalysis && backendData.climateData) {
+        //                 console.log("✅ Using backend soil and climate data");
+                        
+        //                 // Update UI with REAL backend data
+        //                 updateResultsUI(backendData.soilAnalysis, backendData.climateData, backendData);
+        //                 return; // STOP here - don't use frontend analysis
+        //             }
+        //         }
+                
+        //         // If no backend data, use location-specific frontend analysis
+        //         console.log("🔄 Using location-specific frontend analysis");
+        //         const soilData = getLocationSpecificSoilData(farmData.location.latitude, farmData.location.longitude);
+        //         const climateData = getLocationSpecificClimateData(farmData.location.latitude, farmData.location.longitude);
+        //         const recommendations = analyzeLocationSpecificCrops(soilData, climateData);
+                
+        //         updateResultsUI(soilData, climateData, recommendations);
+                
+        //     } catch (error) {
+        //         console.error("Analysis failed:", error);
+        //         useLocationSpecificFallbackData();
+        //     }
+        // }
+                async function initializeAnalysis() {
             showLoadingState();
             
             try {
-                // Step 1: Get real soil data
-                const soilData = await getRealSoilData(farmData.location.latitude, farmData.location.longitude);
+                console.log("🔍 Starting location-specific analysis...");
                 
-                // Step 2: Get real climate data
-                const climateData = await getRealClimateData(farmData.location.latitude, farmData.location.longitude);
+                // Check if we have backend results
+                const savedResults = localStorage.getItem('analysisResults');
                 
-                // Step 3: Analyze crop suitability
-                const recommendations = analyzeCropSuitability(soilData, climateData);
+                if (savedResults) {
+                    console.log("🎯 USING BACKEND DATA");
+                    const backendData = JSON.parse(savedResults);
+                    console.log("📊 Backend Data:", backendData);
+                    
+                    // Use backend data if available
+                    if (backendData.soilAnalysis && backendData.climateData) {
+                        console.log("✅ Using backend soil and climate data");
+                        updateResultsUI(backendData.soilAnalysis, backendData.climateData, backendData);
+                        return;
+                    }
+                }
                 
-                // Step 4: Update UI with results
+                // Use location-specific frontend analysis
+                console.log("🔄 Using location-specific frontend analysis");
+                const soilData = getLocationSpecificSoilData(farmData.location.latitude, farmData.location.longitude);
+                const climateData = getLocationSpecificClimateData(farmData.location.latitude, farmData.location.longitude);
+                const recommendations = analyzeLocationSpecificCrops(soilData, climateData);
+                
                 updateResultsUI(soilData, climateData, recommendations);
                 
             } catch (error) {
                 console.error("Analysis failed:", error);
-                // Fallback to mock data if APIs fail
-                useFallbackData();
+                useLocationSpecificFallbackData();
             }
         }
+
 
         async function getRealSoilData(lat, lon) {
             console.log("🌱 Fetching real soil data...");
@@ -450,51 +624,368 @@
                 return getFallbackClimateData(lat, lon);
             }
         }
+        function getFallbackSoilData(lat, lon) {
+    console.log("🌱 Using location-specific fallback soil data");
+    return getLocationSpecificSoilData(lat, lon);
+}
 
-        function analyzeCropSuitability(soilData, climateData) {
-            console.log("🔍 Analyzing crop suitability...");
+function getFallbackClimateData(lat, lon) {
+    console.log("🌤️ Using location-specific fallback climate data");
+    return getLocationSpecificClimateData(lat, lon);
+}
+
+        // function analyzeCropSuitability(soilData, climateData) {
+        //     console.log("🔍 Analyzing crop suitability...");
             
-            const recommendations = [];
+        //     const recommendations = [];
             
-            // Score each crop based on suitability
-            for (const [cropKey, crop] of Object.entries(CROP_DATABASE)) {
-                let score = 100;
-                let factors = [];
+        //     // Score each crop based on suitability
+        //     for (const [cropKey, crop] of Object.entries(CROP_DATABASE)) {
+        //         let score = 100;
+        //         let factors = [];
                 
-                // Soil pH suitability
-                const phDiff = Math.abs(soilData.ph - crop.soilPH.ideal);
-                const phScore = Math.max(0, 100 - (phDiff * 20));
-                score *= phScore / 100;
-                factors.push(`pH: ${phScore.toFixed(0)}%`);
+        //         // Soil pH suitability
+        //         const phDiff = Math.abs(soilData.ph - crop.soilPH.ideal);
+        //         const phScore = Math.max(0, 100 - (phDiff * 20));
+        //         score *= phScore / 100;
+        //         factors.push(`pH: ${phScore.toFixed(0)}%`);
                 
-                // Temperature suitability
-                const tempDiff = Math.abs(climateData.temperature - crop.temperature.ideal);
-                const tempScore = Math.max(0, 100 - (tempDiff * 5));
-                score *= tempScore / 100;
-                factors.push(`Temp: ${tempScore.toFixed(0)}%`);
+        //         // Temperature suitability
+        //         const tempDiff = Math.abs(climateData.temperature - crop.temperature.ideal);
+        //         const tempScore = Math.max(0, 100 - (tempDiff * 5));
+        //         score *= tempScore / 100;
+        //         factors.push(`Temp: ${tempScore.toFixed(0)}%`);
                 
-                // Rainfall suitability
-                const rainDiff = Math.abs(climateData.rainfall - crop.rainfall.ideal) / crop.rainfall.ideal;
-                const rainScore = Math.max(0, 100 - (rainDiff * 50));
-                score *= rainScore / 100;
-                factors.push(`Rain: ${rainScore.toFixed(0)}%`);
+        //         // Rainfall suitability
+        //         const rainDiff = Math.abs(climateData.rainfall - crop.rainfall.ideal) / crop.rainfall.ideal;
+        //         const rainScore = Math.max(0, 100 - (rainDiff * 50));
+        //         score *= rainScore / 100;
+        //         factors.push(`Rain: ${rainScore.toFixed(0)}%`);
                 
-                // Soil organic matter
-                const organicScore = soilData.organicCarbon > 1.0 ? 100 : soilData.organicCarbon * 100;
-                score *= organicScore / 100;
-                factors.push(`Organic: ${organicScore.toFixed(0)}%`);
+        //         // Soil organic matter
+        //         const organicScore = soilData.organicCarbon > 1.0 ? 100 : soilData.organicCarbon * 100;
+        //         score *= organicScore / 100;
+        //         factors.push(`Organic: ${organicScore.toFixed(0)}%`);
                 
-                recommendations.push({
-                    crop: crop,
-                    score: Math.round(score),
-                    factors: factors,
-                    suitability: getSuitabilityLevel(score)
-                });
-            }
+        //         recommendations.push({
+        //             crop: crop,
+        //             score: Math.round(score),
+        //             factors: factors,
+        //             suitability: getSuitabilityLevel(score)
+        //         });
+        //     }
             
-            // Sort by score (descending)
-            return recommendations.sort((a, b) => b.score - a.score).slice(0, 4);
+        //     // Sort by score (descending)
+        //     return recommendations.sort((a, b) => b.score - a.score).slice(0, 4);
+        // }
+        // Improved location-specific crop recommendations
+// function analyzeLocationSpecificCrops(soilData, climateData) {
+//     const lat = farmData.location.latitude;
+//     const lon = farmData.location.longitude;
+    
+//     console.log("🌾 Analyzing crops for:", { lat, lon, soilData, climateData });
+    
+//     // Get base crops for the region
+//     const regionalCrops = getRegionalBaseCrops(lat, lon);
+    
+//     // Score each crop based on ACTUAL soil and climate conditions
+//     const scoredCrops = regionalCrops.map(crop => {
+//         let score = 100;
+//         let factors = [];
+        
+//         // Soil pH suitability (20% weight)
+//         const phDiff = Math.abs(soilData.soilPh - getCropIdealPH(crop.name));
+//         const phScore = Math.max(0, 100 - (phDiff * 15));
+//         score = (score * 0.8) + (phScore * 0.2);
+//         factors.push(`pH: ${phScore.toFixed(0)}%`);
+        
+//         // Temperature suitability (30% weight)
+//         const tempDiff = Math.abs(climateData.avgTemperature - getCropIdealTemp(crop.name));
+//         const tempScore = Math.max(0, 100 - (tempDiff * 3));
+//         score = (score * 0.7) + (tempScore * 0.3);
+//         factors.push(`Temp: ${tempScore.toFixed(0)}%`);
+        
+//         // Rainfall suitability (25% weight)
+//         const rainDiff = Math.abs(climateData.annualRainfall - getCropIdealRainfall(crop.name));
+//         const rainRatio = rainDiff / getCropIdealRainfall(crop.name);
+//         const rainScore = Math.max(0, 100 - (rainRatio * 60));
+//         score = (score * 0.75) + (rainScore * 0.25);
+//         factors.push(`Rain: ${rainScore.toFixed(0)}%`);
+        
+//         // Soil organic matter suitability (15% weight)
+//         const organicScore = soilData.organicCarbon > 1.2 ? 100 : (soilData.organicCarbon / 1.2) * 100;
+//         score = (score * 0.85) + (organicScore * 0.15);
+//         factors.push(`Organic: ${organicScore.toFixed(0)}%`);
+        
+//         // Nitrogen level suitability (10% weight)
+//         const nitrogenScore = soilData.nitrogenLevel > 1200 ? 100 : (soilData.nitrogenLevel / 1200) * 100;
+//         score = (score * 0.9) + (nitrogenScore * 0.1);
+//         factors.push(`Nitrogen: ${nitrogenScore.toFixed(0)}%`);
+        
+//         return {
+//             crop: crop,
+//             score: Math.round(score),
+//             factors: factors,
+//             suitability: getSuitabilityLevel(score)
+//         };
+//     });
+    
+//     // Sort by score and return top 5
+//     return scoredCrops.sort((a, b) => b.score - a.score).slice(0, 5);
+// }
+
+// Dynamic crop analysis based on actual conditions
+function analyzeLocationSpecificCrops(soilData, climateData) {
+    console.log("🌾 Dynamic crop analysis for:", { soilData, climateData });
+    
+    // Score ALL available crops based on current conditions
+    const allCrops = getAllAvailableCrops();
+    const scoredCrops = [];
+    
+    for (const crop of allCrops) {
+        let score = 100;
+        let factors = [];
+        
+        // 1. Soil pH suitability (25% weight)
+        const phDiff = Math.abs(soilData.soilPh - crop.idealPH);
+        const phScore = Math.max(0, 100 - (phDiff * 20));
+        score = (score * 0.75) + (phScore * 0.25);
+        factors.push(`pH: ${phScore.toFixed(0)}%`);
+        
+        // 2. Temperature suitability (30% weight)
+        const tempDiff = Math.abs(climateData.avgTemperature - crop.idealTemp);
+        const tempScore = Math.max(0, 100 - (tempDiff * 4));
+        score = (score * 0.70) + (tempScore * 0.30);
+        factors.push(`Temp: ${tempScore.toFixed(0)}%`);
+        
+        // 3. Rainfall suitability (25% weight)
+        const rainDiff = Math.abs(climateData.annualRainfall - crop.idealRainfall);
+        const rainRatio = rainDiff / crop.idealRainfall;
+        const rainScore = Math.max(0, 100 - (rainRatio * 50));
+        score = (score * 0.75) + (rainScore * 0.25);
+        factors.push(`Rain: ${rainScore.toFixed(0)}%`);
+        
+        // 4. Regional bonus (20% weight) - crops that grow well in that region
+        const regionBonus = getRegionalBonus(crop.name, farmData.location.latitude, farmData.location.longitude);
+        score = (score * 0.80) + (regionBonus * 0.20);
+        factors.push(`Region: ${regionBonus.toFixed(0)}%`);
+        
+        // Only include crops with decent suitability
+        if (score >= 40) {
+            scoredCrops.push({
+                crop: {
+                    name: crop.name,
+                    season: crop.season,
+                    duration: crop.duration,
+                    yield: crop.yield,
+                    waterRequirement: crop.waterRequirement
+                },
+                score: Math.round(score),
+                factors: factors,
+                suitability: getSuitabilityLevel(score)
+            });
         }
+    }
+    
+    // Sort by score and return top 6
+    return scoredCrops.sort((a, b) => b.score - a.score).slice(0, 6);
+}
+
+// Comprehensive crop database with actual requirements
+function getAllAvailableCrops() {
+    return [
+        // Cereals
+        { name: "Rice", idealPH: 6.2, idealTemp: 25, idealRainfall: 1500, season: "Kharif", duration: 90, yield: "4-6 tons/ha", waterRequirement: "High" },
+        { name: "Wheat", idealPH: 6.8, idealTemp: 17, idealRainfall: 750, season: "Rabi", duration: 120, yield: "3-5 tons/ha", waterRequirement: "Medium" },
+        { name: "Maize", idealPH: 6.5, idealTemp: 22, idealRainfall: 800, season: "Kharif", duration: 85, yield: "2-4 tons/ha", waterRequirement: "Medium" },
+        { name: "Pearl Millet", idealPH: 7.5, idealTemp: 30, idealRainfall: 400, season: "Kharif", duration: 85, yield: "1-2 tons/ha", waterRequirement: "Low" },
+        { name: "Sorghum", idealPH: 7.0, idealTemp: 30, idealRainfall: 450, season: "Kharif", duration: 90, yield: "2-3 tons/ha", waterRequirement: "Low" },
+        
+        // Pulses
+        { name: "Chickpea", idealPH: 6.8, idealTemp: 20, idealRainfall: 600, season: "Rabi", duration: 100, yield: "1-2 tons/ha", waterRequirement: "Low" },
+        { name: "Pigeon Pea", idealPH: 6.5, idealTemp: 26, idealRainfall: 700, season: "Kharif", duration: 150, yield: "1-1.5 tons/ha", waterRequirement: "Low" },
+        { name: "Moong Bean", idealPH: 7.0, idealTemp: 28, idealRainfall: 500, season: "Kharif", duration: 65, yield: "0.5-1 ton/ha", waterRequirement: "Low" },
+        { name: "Urad Bean", idealPH: 6.8, idealTemp: 25, idealRainfall: 600, season: "Kharif", duration: 80, yield: "0.5-1 ton/ha", waterRequirement: "Low" },
+        { name: "Lentil", idealPH: 6.5, idealTemp: 18, idealRainfall: 500, season: "Rabi", duration: 110, yield: "0.8-1.2 tons/ha", waterRequirement: "Low" },
+        
+        // Oilseeds
+        { name: "Mustard", idealPH: 6.8, idealTemp: 18, idealRainfall: 500, season: "Rabi", duration: 110, yield: "1-2 tons/ha", waterRequirement: "Low" },
+        { name: "Groundnut", idealPH: 6.5, idealTemp: 28, idealRainfall: 600, season: "Kharif", duration: 105, yield: "1-2 tons/ha", waterRequirement: "Low" },
+        { name: "Sunflower", idealPH: 6.8, idealTemp: 25, idealRainfall: 500, season: "Rabi", duration: 95, yield: "1-2 tons/ha", waterRequirement: "Low" },
+        { name: "Soybean", idealPH: 6.5, idealTemp: 24, idealRainfall: 600, season: "Kharif", duration: 100, yield: "1.5-2.5 tons/ha", waterRequirement: "Medium" },
+        
+        // Cash Crops
+        { name: "Cotton", idealPH: 7.0, idealTemp: 28, idealRainfall: 650, season: "Kharif", duration: 150, yield: "2-3 tons/ha", waterRequirement: "Medium" },
+        { name: "Sugarcane", idealPH: 7.0, idealTemp: 27, idealRainfall: 2000, season: "Annual", duration: 365, yield: "70-100 tons/ha", waterRequirement: "High" },
+        { name: "Jute", idealPH: 6.5, idealTemp: 26, idealRainfall: 1800, season: "Kharif", duration: 120, yield: "2-3 tons/ha", waterRequirement: "High" },
+        
+        // Fruits
+        { name: "Mango", idealPH: 6.5, idealTemp: 27, idealRainfall: 1200, season: "Annual", duration: 365, yield: "8-10 tons/ha", waterRequirement: "Medium" },
+        { name: "Banana", idealPH: 6.5, idealTemp: 27, idealRainfall: 2000, season: "Annual", duration: 365, yield: "40-50 tons/ha", waterRequirement: "High" },
+        { name: "Apple", idealPH: 6.0, idealTemp: 15, idealRainfall: 1200, season: "Annual", duration: 365, yield: "15-20 tons/ha", waterRequirement: "Medium" },
+        { name: "Orange", idealPH: 6.5, idealTemp: 23, idealRainfall: 1000, season: "Annual", duration: 365, yield: "10-15 tons/ha", waterRequirement: "Medium" },
+        
+        // Vegetables
+        { name: "Potato", idealPH: 5.5, idealTemp: 18, idealRainfall: 1000, season: "Rabi", duration: 100, yield: "20-25 tons/ha", waterRequirement: "High" },
+        { name: "Tomato", idealPH: 6.5, idealTemp: 22, idealRainfall: 800, season: "Year-round", duration: 90, yield: "25-30 tons/ha", waterRequirement: "Medium" },
+        { name: "Onion", idealPH: 6.8, idealTemp: 20, idealRainfall: 600, season: "Rabi", duration: 120, yield: "15-20 tons/ha", waterRequirement: "Medium" },
+        { name: "Brinjal", idealPH: 6.5, idealTemp: 25, idealRainfall: 700, season: "Year-round", duration: 100, yield: "20-25 tons/ha", waterRequirement: "Medium" },
+        
+        // Spices & Special
+        { name: "Black Pepper", idealPH: 5.5, idealTemp: 25, idealRainfall: 2200, season: "Annual", duration: 365, yield: "500-800 kg/ha", waterRequirement: "Medium" },
+        { name: "Cardamom", idealPH: 6.0, idealTemp: 22, idealRainfall: 2500, season: "Annual", duration: 365, yield: "100-150 kg/ha", waterRequirement: "High" },
+        { name: "Turmeric", idealPH: 6.5, idealTemp: 24, idealRainfall: 1500, season: "Kharif", duration: 240, yield: "20-25 tons/ha", waterRequirement: "Medium" },
+        { name: "Ginger", idealPH: 6.5, idealTemp: 25, idealRainfall: 1600, season: "Kharif", duration: 210, yield: "15-20 tons/ha", waterRequirement: "Medium" },
+        
+        // Plantation
+        { name: "Coconut", idealPH: 6.0, idealTemp: 28, idealRainfall: 1800, season: "Annual", duration: 365, yield: "80-100 nuts/tree", waterRequirement: "Medium" },
+        { name: "Cashew", idealPH: 6.0, idealTemp: 30, idealRainfall: 1500, season: "Annual", duration: 365, yield: "1-2 tons/ha", waterRequirement: "Low" },
+        { name: "Arecanut", idealPH: 6.0, idealTemp: 27, idealRainfall: 2000, season: "Annual", duration: 365, yield: "1-1.5 tons/ha", waterRequirement: "High" },
+        
+        // Others
+        { name: "Saffron", idealPH: 6.5, idealTemp: 12, idealRainfall: 800, season: "Annual", duration: 365, yield: "2-3 kg/ha", waterRequirement: "Low" },
+        { name: "Cluster Bean", idealPH: 7.0, idealTemp: 32, idealRainfall: 300, season: "Kharif", duration: 90, yield: "0.5-1 ton/ha", waterRequirement: "Very Low" },
+        { name: "Guar", idealPH: 7.5, idealTemp: 32, idealRainfall: 350, season: "Kharif", duration: 95, yield: "1-2 tons/ha", waterRequirement: "Very Low" }
+    ];
+}
+
+// Regional suitability bonus
+function getRegionalBonus(cropName, lat, lon) {
+    const regionalPreferences = {
+        // Himalayan crops
+        "Apple": lat > 30 ? 100 : 40,
+        "Saffron": lat > 30 ? 100 : 30,
+        "Potato": lat > 25 ? 80 : 60,
+        
+        // Dry region crops
+        "Pearl Millet": (lat > 28 && lon < 75) ? 100 : 50,
+        "Cluster Bean": (lat > 28 && lon < 75) ? 100 : 40,
+        "Guar": (lat > 28 && lon < 75) ? 100 : 45,
+        
+        // Eastern crops
+        "Jute": (lat > 25 && lon > 85) ? 100 : 60,
+        "Pigeon Pea": (lat > 25 && lon > 85) ? 90 : 70,
+        
+        // Northern plains crops
+        "Wheat": (lat > 20 && lat <= 25) ? 100 : 70,
+        "Sugarcane": (lat > 20 && lat <= 25) ? 95 : 65,
+        "Mustard": (lat > 20 && lat <= 25) ? 90 : 60,
+        
+        // Southern crops
+        "Cotton": (lat > 15 && lat <= 20) ? 100 : 70,
+        "Groundnut": (lat > 15 && lat <= 20) ? 95 : 65,
+        "Sorghum": (lat > 15 && lat <= 20) ? 90 : 60,
+        
+        // Coastal crops
+        "Coconut": lat <= 15 ? 100 : 50,
+        "Black Pepper": lat <= 15 ? 100 : 40,
+        "Arecanut": lat <= 15 ? 100 : 30,
+        "Banana": lat <= 15 ? 95 : 70,
+        "Cardamom": (lat <= 15 || lat > 25) ? 80 : 50
+    };
+    
+    return regionalPreferences[cropName] || 70; // Default 70% if no specific preference
+}
+
+// Helper functions for crop requirements
+function getCropIdealPH(cropName) {
+    const phRequirements = {
+        "Rice": 6.2, "Wheat": 6.8, "Maize": 6.5, "Cotton": 7.0, "Sugarcane": 7.0,
+        "Pulses": 6.8, "Oilseeds": 6.8, "Apple": 6.0, "Potato": 5.5, "Saffron": 6.5,
+        "Pearl Millet": 7.5, "Cluster Bean": 7.0, "Moong Bean": 7.0, "Guar": 7.5,
+        "Isabgol": 7.0, "Groundnut": 6.5, "Sunflower": 6.8, "Sorghum": 7.0,
+        "Coconut": 6.0, "Banana": 6.5, "Black Pepper": 5.5, "Cashew": 6.0,
+        "Vegetables": 6.5
+    };
+    return phRequirements[cropName] || 6.5;
+}
+
+function getCropIdealTemp(cropName) {
+    const tempRequirements = {
+        "Rice": 25, "Wheat": 17, "Maize": 22, "Cotton": 28, "Sugarcane": 27,
+        "Pulses": 20, "Oilseeds": 18, "Apple": 15, "Potato": 18, "Saffron": 12,
+        "Pearl Millet": 30, "Cluster Bean": 32, "Moong Bean": 28, "Guar": 32,
+        "Isabgol": 25, "Groundnut": 28, "Sunflower": 25, "Sorghum": 30,
+        "Coconut": 28, "Banana": 27, "Black Pepper": 25, "Cashew": 30,
+        "Vegetables": 22
+    };
+    return tempRequirements[cropName] || 25;
+}
+
+function getCropIdealRainfall(cropName) {
+    const rainfallRequirements = {
+        "Rice": 1500, "Wheat": 750, "Maize": 800, "Cotton": 650, "Sugarcane": 2000,
+        "Pulses": 600, "Oilseeds": 500, "Apple": 1200, "Potato": 1000, "Saffron": 800,
+        "Pearl Millet": 400, "Cluster Bean": 300, "Moong Bean": 500, "Guar": 350,
+        "Isabgol": 600, "Groundnut": 600, "Sunflower": 500, "Sorghum": 450,
+        "Coconut": 1800, "Banana": 2000, "Black Pepper": 2200, "Cashew": 1500,
+        "Vegetables": 800
+    };
+    return rainfallRequirements[cropName] || 1000;
+}
+
+// Get base crops for different regions
+function getRegionalBaseCrops(lat, lon) {
+    let baseCrops = [];
+    
+    if (lat > 30.0) {
+        // Himalayan region
+        baseCrops = [
+            { name: "Apple", season: "Annual", duration: 365, yield: "15-20 tons/ha", waterRequirement: "Medium" },
+            { name: "Potato", season: "Rabi", duration: 100, yield: "20-25 tons/ha", waterRequirement: "High" },
+            { name: "Maize", season: "Kharif", duration: 85, yield: "2-3 tons/ha", waterRequirement: "Medium" },
+            { name: "Saffron", season: "Annual", duration: 365, yield: "2-3 kg/ha", waterRequirement: "Low" },
+            { name: "Vegetables", season: "Year-round", duration: 60, yield: "15-20 tons/ha", waterRequirement: "High" }
+        ];
+    } else if (lat > 28.0 && lon < 75.0) {
+        // Western Dry region (Rajasthan)
+        baseCrops = [
+            { name: "Pearl Millet", season: "Kharif", duration: 85, yield: "1-2 tons/ha", waterRequirement: "Low" },
+            { name: "Cluster Bean", season: "Kharif", duration: 90, yield: "0.5-1 ton/ha", waterRequirement: "Very Low" },
+            { name: "Moong Bean", season: "Kharif", duration: 65, yield: "0.5-1 ton/ha", waterRequirement: "Low" },
+            { name: "Guar", season: "Kharif", duration: 95, yield: "1-2 tons/ha", waterRequirement: "Very Low" },
+            { name: "Isabgol", season: "Rabi", duration: 110, yield: "1-1.5 tons/ha", waterRequirement: "Low" }
+        ];
+    } else if (lat > 25.0 && lon > 85.0) {
+        // Eastern region
+        baseCrops = [
+            { name: "Rice", season: "Kharif", duration: 90, yield: "3-5 tons/ha", waterRequirement: "High" },
+            { name: "Pulses", season: "Rabi", duration: 100, yield: "1-2 tons/ha", waterRequirement: "Low" },
+            { name: "Oilseeds", season: "Rabi", duration: 110, yield: "1-2 tons/ha", waterRequirement: "Low" },
+            { name: "Maize", season: "Kharif", duration: 85, yield: "2-3 tons/ha", waterRequirement: "Medium" },
+            { name: "Vegetables", season: "Year-round", duration: 60, yield: "15-20 tons/ha", waterRequirement: "High" }
+        ];
+    } else if (lat > 20.0 && lat <= 25.0) {
+        // Northern Plains
+        baseCrops = [
+            { name: "Wheat", season: "Rabi", duration: 120, yield: "4-5 tons/ha", waterRequirement: "Medium" },
+            { name: "Rice", season: "Kharif", duration: 90, yield: "4-6 tons/ha", waterRequirement: "High" },
+            { name: "Sugarcane", season: "Annual", duration: 365, yield: "70-80 tons/ha", waterRequirement: "High" },
+            { name: "Maize", season: "Kharif", duration: 85, yield: "3-4 tons/ha", waterRequirement: "Medium" },
+            { name: "Mustard", season: "Rabi", duration: 110, yield: "1-2 tons/ha", waterRequirement: "Low" }
+        ];
+    } else if (lat > 15.0 && lat <= 20.0) {
+        // Southern Plateau
+        baseCrops = [
+            { name: "Cotton", season: "Kharif", duration: 150, yield: "2-3 tons/ha", waterRequirement: "Medium" },
+            { name: "Groundnut", season: "Kharif", duration: 105, yield: "1-2 tons/ha", waterRequirement: "Low" },
+            { name: "Sunflower", season: "Rabi", duration: 95, yield: "1-2 tons/ha", waterRequirement: "Low" },
+            { name: "Sugarcane", season: "Annual", duration: 365, yield: "80-100 tons/ha", waterRequirement: "High" },
+            { name: "Sorghum", season: "Kharif", duration: 90, yield: "2-3 tons/ha", waterRequirement: "Low" }
+        ];
+    } else {
+        // Coastal region
+        baseCrops = [
+            { name: "Coconut", season: "Annual", duration: 365, yield: "80-100 nuts/tree", waterRequirement: "Medium" },
+            { name: "Rice", season: "Kharif", duration: 90, yield: "5-7 tons/ha", waterRequirement: "High" },
+            { name: "Banana", season: "Annual", duration: 365, yield: "40-50 tons/ha", waterRequirement: "High" },
+            { name: "Black Pepper", season: "Annual", duration: 365, yield: "500-800 kg/ha", waterRequirement: "Medium" },
+            { name: "Cashew", season: "Annual", duration: 365, yield: "1-2 tons/ha", waterRequirement: "Low" }
+        ];
+    }
+    
+    return baseCrops;
+}
 
         function getSuitabilityLevel(score) {
             if (score >= 80) return { level: "Excellent", color: "#10b981" };
@@ -503,78 +994,172 @@
             return { level: "Poor", color: "#ef4444" };
         }
 
-        function updateResultsUI(soilData, climateData, recommendations) {
-            // Update soil metrics
-            document.getElementById('soilPH').textContent = soilData.ph.toFixed(1);
-            document.getElementById('soilOrganic').textContent = soilData.organicCarbon.toFixed(1) + '%';
-            document.getElementById('soilNitrogen').textContent = Math.round(soilData.nitrogen) + ' kg/ha';
-            
-            // Update climate data
-            document.getElementById('avgTemp').textContent = climateData.temperature.toFixed(1) + '°C';
-            document.getElementById('annualRainfall').textContent = Math.round(climateData.rainfall) + ' mm';
-            document.getElementById('sunshineHours').textContent = climateData.sunshine.toFixed(1) + ' hrs/day';
-            document.getElementById('summaryRainfall').textContent = Math.round(climateData.rainfall) + ' mm/year';
-            
-            // Update progress bars
-            updateProgressBars(soilData);
-            
-            // Display recommendations
-            displayRecommendations(recommendations);
-            
-            // Create climate chart
-            createClimateChart(climateData);
-            
-            // Update seasonal recommendations
-            updateSeasonalRecommendations(recommendations);
-            
-            // Hide loading state
-            hideLoadingState();
-        }
-
+// function updateResultsUI(soilData, climateData, recommendations) {
+//     console.log("📊 Updating UI with data:", { soilData, climateData, recommendations });
+    
+//     // Update soil metrics
+//     document.getElementById('soilPH').textContent = soilData.soilPh ? soilData.soilPh.toFixed(1) : (soilData.ph ? soilData.ph.toFixed(1) : '6.5');
+//     document.getElementById('soilOrganic').textContent = soilData.organicCarbon ? soilData.organicCarbon.toFixed(1) + '%' : '1.5%';
+//     document.getElementById('soilNitrogen').textContent = soilData.nitrogenLevel ? soilData.nitrogenLevel + ' kg/ha' : '1200 kg/ha';
+//     document.getElementById('summarySoil').textContent = soilData.soilType || 'Loam Soil';
+    
+//     // Update climate data
+//     document.getElementById('avgTemp').textContent = climateData.avgTemperature ? climateData.avgTemperature.toFixed(1) + '°C' : '25.0°C';
+//     document.getElementById('annualRainfall').textContent = climateData.annualRainfall ? climateData.annualRainfall + ' mm' : '1000 mm';
+//     document.getElementById('sunshineHours').textContent = climateData.sunshineHours ? climateData.sunshineHours.toFixed(1) + ' hrs/day' : '6.0 hrs/day';
+//     document.getElementById('summaryRainfall').textContent = climateData.annualRainfall ? climateData.annualRainfall + ' mm/year' : '1000 mm/year';
+//     document.getElementById('summaryClimate').textContent = climateData.climateZone || 'Tropical';
+    
+//     // Update progress bars
+//     updateProgressBars(soilData);
+    
+//     // Handle different recommendation formats
+//     let recommendationsArray = [];
+    
+//     if (Array.isArray(recommendations)) {
+//         // Direct array format
+//         recommendationsArray = recommendations;
+//     } else if (recommendations && Array.isArray(recommendations.recommendations)) {
+//         // Backend response format with recommendations array
+//         recommendationsArray = recommendations.recommendations;
+//     } else if (recommendations && recommendations.crops) {
+//         // Alternative backend format
+//         recommendationsArray = recommendations.crops;
+//     } else {
+//         // Fallback: generate recommendations
+//         console.log("🔄 Generating fallback recommendations");
+//         recommendationsArray = analyzeCropSuitability(soilData, climateData);
+//     }
+    
+//     console.log("🌾 Displaying recommendations:", recommendationsArray);
+//     displayRecommendations(recommendationsArray);
+    
+//     // Create climate chart (with fallback data)
+//     const chartClimateData = climateData.monthlyTemp ? climateData : getFallbackClimateData(farmData.location.latitude, farmData.location.longitude);
+//     createClimateChart(chartClimateData);
+    
+//     // Update seasonal recommendations
+//     updateSeasonalRecommendations(recommendationsArray);
+    
+//     // Hide loading state
+//     hideLoadingState();
+// }
+function updateResultsUI(soilData, climateData, recommendations) {
+    console.log("📊 Updating UI with data:", { soilData, climateData, recommendations });
+    
+    // Update soil metrics
+    document.getElementById('soilPH').textContent = soilData.soilPh ? soilData.soilPh.toFixed(1) : (soilData.ph ? soilData.ph.toFixed(1) : '6.5');
+    document.getElementById('soilOrganic').textContent = soilData.organicCarbon ? soilData.organicCarbon.toFixed(1) + '%' : '1.5%';
+    document.getElementById('soilNitrogen').textContent = soilData.nitrogenLevel ? soilData.nitrogenLevel + ' kg/ha' : '1200 kg/ha';
+    document.getElementById('summarySoil').textContent = soilData.soilType || 'Loam Soil';
+    
+    // Update climate data
+    document.getElementById('avgTemp').textContent = climateData.avgTemperature ? climateData.avgTemperature.toFixed(1) + '°C' : '25.0°C';
+    document.getElementById('annualRainfall').textContent = climateData.annualRainfall ? climateData.annualRainfall + ' mm' : '1000 mm';
+    document.getElementById('sunshineHours').textContent = climateData.sunshineHours ? climateData.sunshineHours.toFixed(1) + ' hrs/day' : '6.0 hrs/day';
+    document.getElementById('summaryRainfall').textContent = climateData.annualRainfall ? climateData.annualRainfall + ' mm/year' : '1000 mm/year';
+    document.getElementById('summaryClimate').textContent = climateData.climateZone || 'Tropical';
+    
+    // Update progress bars
+    updateProgressBars(soilData);
+    
+    // Handle different recommendation formats
+    let recommendationsArray = [];
+    
+    if (Array.isArray(recommendations)) {
+        // Direct array format (frontend)
+        recommendationsArray = recommendations;
+    } else if (recommendations && Array.isArray(recommendations.recommendations)) {
+        // Backend response format with recommendations array
+        recommendationsArray = recommendations.recommendations.map(rec => ({
+            crop: {
+                name: rec.cropName,
+                season: rec.season,
+                duration: rec.duration,
+                yield: rec.yield,
+                waterRequirement: rec.waterRequirement
+            },
+            score: rec.score,
+            suitability: getSuitabilityLevel(rec.score)
+        }));
+    } else if (recommendations && recommendations.crops) {
+        // Alternative backend format
+        recommendationsArray = recommendations.crops;
+    } else {
+        // Fallback: generate recommendations
+        console.log("🔄 Generating fallback recommendations");
+        recommendationsArray = analyzeCropSuitability(soilData, climateData);
+    }
+    
+    console.log("🌾 Displaying recommendations:", recommendationsArray);
+    displayRecommendations(recommendationsArray);
+    
+    // Create climate chart
+    const chartClimateData = climateData.monthlyTemp ? climateData : getLocationSpecificClimateData(farmData.location.latitude, farmData.location.longitude);
+    createClimateChart(chartClimateData);
+    
+    // Update seasonal recommendations
+    updateSeasonalRecommendations(recommendationsArray);
+    
+    // Hide loading state
+    hideLoadingState();
+}
         function displayRecommendations(recommendations) {
-            const grid = document.getElementById('recommendationsGrid');
-            grid.innerHTML = '';
-            
-            recommendations.forEach((rec, index) => {
-                const crop = rec.crop;
-                const cropElement = document.createElement('div');
-                cropElement.className = 'crop-card';
-                cropElement.innerHTML = `
-                    <div class="crop-header">
-                        <h3>${crop.name}</h3>
-                        <div class="score-badge" style="background: ${rec.suitability.color}">
-                            ${rec.score}%
-                        </div>
-                    </div>
-                    <div class="crop-details">
-                        <div class="crop-metric">
-                            <span>🌱 Season:</span>
-                            <span>${crop.season.join(', ')}</span>
-                        </div>
-                        <div class="crop-metric">
-                            <span>⏱️ Duration:</span>
-                            <span>${crop.duration} days</span>
-                        </div>
-                        <div class="crop-metric">
-                            <span>📈 Yield:</span>
-                            <span>${crop.yield}</span>
-                        </div>
-                        <div class="crop-metric">
-                            <span>💧 Water:</span>
-                            <span>${crop.waterRequirement}</span>
-                        </div>
-                    </div>
-                    <div class="suitability-info">
-                        <strong>Suitability: ${rec.suitability.level}</strong>
-                        <div class="factors">
-                            ${rec.factors.map(f => `<span class="factor">${f}</span>`).join('')}
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(cropElement);
-            });
-        }
-
+    const grid = document.getElementById('recommendationsGrid');
+    grid.innerHTML = '';
+    
+    console.log("🔄 Displaying recommendations array:", recommendations);
+    
+    if (!recommendations || recommendations.length === 0) {
+        grid.innerHTML = '<div class="no-recommendations">No crop recommendations available for this location.</div>';
+        return;
+    }
+    
+    recommendations.forEach((rec, index) => {
+        // Handle different object structures
+        const crop = rec.crop || rec;
+        const score = rec.score || rec.suitabilityScore || 80;
+        const suitability = rec.suitability || getSuitabilityLevel(score);
+        
+        const cropElement = document.createElement('div');
+        cropElement.className = 'crop-card';
+        cropElement.innerHTML = `
+            <div class="crop-header">
+                <h3>${crop.name || crop.cropName || 'Crop'}</h3>
+                <div class="score-badge" style="background: ${suitability.color || '#10b981'}">
+                    ${score}%
+                </div>
+            </div>
+            <div class="crop-details">
+                <div class="crop-metric">
+                    <span>🌱 Season:</span>
+                    <span>${crop.season || 'Kharif'}</span>
+                </div>
+                <div class="crop-metric">
+                    <span>⏱️ Duration:</span>
+                    <span>${crop.duration || crop.durationDays || 90} days</span>
+                </div>
+                <div class="crop-metric">
+                    <span>📈 Yield:</span>
+                    <span>${crop.yield || crop.expectedYield || '3-5 tons/ha'}</span>
+                </div>
+                <div class="crop-metric">
+                    <span>💧 Water:</span>
+                    <span>${crop.water || crop.waterRequirement || 'Medium'}</span>
+                </div>
+            </div>
+            <div class="suitability-info">
+                <strong>Suitability: ${suitability.level || 'Good'}</strong>
+                ${rec.factors ? `
+                <div class="factors">
+                    ${rec.factors.map(f => `<span class="factor">${f}</span>`).join('')}
+                </div>
+                ` : ''}
+            </div>
+        `;
+        grid.appendChild(cropElement);
+    });
+}
         // Fallback data functions and other utility functions...
         // [Previous fallback and utility functions remain the same]
 
@@ -596,18 +1181,137 @@
             });
         }
 
-        function saveRecommendations() {
-            const dataToSave = {
-                farmerData: farmData,
-                analysisResults: analysisResults,
-                timestamp: new Date().toISOString()
-            };
+        async function saveRecommendations() {
+            console.log("💾 Save Recommendations button clicked");
             
-            // In real app, this would save to database
-            localStorage.setItem('savedRecommendations', JSON.stringify(dataToSave));
-            alert('✅ Recommendations saved successfully!');
+            try {
+                // Get the current analysis results
+                const savedData = localStorage.getItem('analysisResults');
+                const farmData = localStorage.getItem('farmData');
+                
+                if (!savedData && !farmData) {
+                    alert('No analysis data found. Please analyze a farm first.');
+                    return;
+                }
+                
+                let farmerId, farmerName, recommendations;
+                
+                if (savedData) {
+                    // Data from backend analysis
+                    const analysisResults = JSON.parse(savedData);
+                    farmerId = analysisResults.farmerId;
+                    farmerName = document.getElementById('welcomeName').textContent;
+                    recommendations = await extractRecommendationsFromUI();
+                } else {
+                    // Fallback data
+                    const farmDataObj = JSON.parse(farmData);
+                    farmerName = farmDataObj.farmerName;
+                    farmerId = null; // Will use latest farmer
+                    recommendations = await extractRecommendationsFromUI();
+                }
+                
+                // Prepare data for saving
+                const saveData = {
+                    farmerId: farmerId,
+                    farmerName: farmerName,
+                    recommendations: recommendations,
+                    savedAt: new Date().toISOString()
+                };
+                
+                console.log('Saving recommendations:', saveData);
+                
+                // Show loading state
+                const saveBtn = document.querySelector('.action-btn.primary');
+                const originalText = saveBtn.textContent;
+                saveBtn.innerHTML = '💾 Saving...';
+                saveBtn.disabled = true;
+                
+                // Send to backend
+                const response = await fetch('http://localhost:8080/api/analysis/save-recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(saveData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ Save response:', result);
+                
+                alert(`✅ ${result.message}\nSaved ${result.savedCount} recommendations for ${farmerName}`);
+                
+                // Restore button
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('❌ Error saving recommendations:', error);
+                alert('❌ Failed to save recommendations: ' + error.message);
+                
+                // Restore button on error
+                const saveBtn = document.querySelector('.action-btn.primary');
+                saveBtn.innerHTML = '💾 Save Recommendations';
+                saveBtn.disabled = false;
+            }
         }
 
+        // Helper function to extract recommendations from the UI
+        async function extractRecommendationsFromUI() {
+            const recommendations = [];
+            
+            // Get all crop cards
+            const cropCards = document.querySelectorAll('.crop-card');
+            
+            for (const card of cropCards) {
+                const cropName = card.querySelector('h3').textContent;
+                const scoreElement = card.querySelector('.score-badge');
+                const suitabilityScore = scoreElement ? parseInt(scoreElement.textContent) : 80;
+                
+                // Extract details from the card
+                const details = card.querySelectorAll('.crop-metric');
+                let season = 'Kharif';
+                let durationDays = 90;
+                let expectedYield = '3-5 tons/ha';
+                let waterRequirement = 'Medium';
+                
+                details.forEach(detail => {
+                    const text = detail.textContent;
+                    if (text.includes('Season:')) {
+                        season = text.split(':')[1].trim();
+                    } else if (text.includes('Duration:')) {
+                        const durationText = text.split(':')[1].trim();
+                        durationDays = parseInt(durationText) || 90;
+                    } else if (text.includes('Yield:')) {
+                        expectedYield = text.split(':')[1].trim();
+                    } else if (text.includes('Water:')) {
+                        waterRequirement = text.split(':')[1].trim();
+                    }
+                });
+                
+                // Get soil and climate data from the analysis
+                const soilPH = parseFloat(document.getElementById('soilPH').textContent) || 6.5;
+                const temperature = parseFloat(document.getElementById('avgTemp').textContent) || 25.0;
+                const rainfall = parseInt(document.getElementById('annualRainfall').textContent) || 1000;
+                
+                recommendations.push({
+                    cropName: cropName,
+                    score: suitabilityScore,
+                    season: season,
+                    soilPh: soilPH,
+                    temperature: temperature,
+                    rainfall: rainfall,
+                    durationDays: durationDays,
+                    expectedYield: expectedYield,
+                    waterRequirement: waterRequirement
+                });
+            }
+            
+            return recommendations;
+        }
         function shareResults() {
             if (navigator.share) {
                 navigator.share({
@@ -620,51 +1324,235 @@
             }
         }
 
-        // Fallback data functions (kept as backup)
-        function getFallbackSoilData(lat, lon) {
-            // Regional soil data for India
-            if (lat > 20 && lat < 30 && lon > 70 && lon < 90) {
-                return { ph: 7.2, organicCarbon: 1.8, nitrogen: 1500 }; // North-West
-            } else if (lat > 10 && lat < 20 && lon > 70 && lon < 80) {
-                return { ph: 6.8, organicCarbon: 1.2, nitrogen: 1100 }; // West
+        // // Fallback data functions (kept as backup)
+        // function getFallbackSoilData(lat, lon) {
+        //     // Regional soil data for India
+        //     if (lat > 20 && lat < 30 && lon > 70 && lon < 90) {
+        //         return { ph: 7.2, organicCarbon: 1.8, nitrogen: 1500 }; // North-West
+        //     } else if (lat > 10 && lat < 20 && lon > 70 && lon < 80) {
+        //         return { ph: 6.8, organicCarbon: 1.2, nitrogen: 1100 }; // West
+        //     } else {
+        //         return { ph: 6.5, organicCarbon: 1.5, nitrogen: 1300 }; // General
+        //     }
+        // }
+
+        // function getFallbackClimateData(lat, lon) {
+        //     // Regional climate patterns for India
+        //     let temp = 25, rain = 1000, sunshine = 6;
+            
+        //     if (lat > 20 && lat < 30) {
+        //         temp = 28; rain = 800; sunshine = 7; // North
+        //     } else if (lat > 10 && lat < 20) {
+        //         temp = 32; rain = 1200; sunshine = 6; // Central
+        //     } else if (lat < 10) {
+        //         temp = 30; rain = 2500; sunshine = 5; // South
+        //     }
+            
+        //     return {
+        //         temperature: temp,
+        //         rainfall: rain,
+        //         sunshine: sunshine,
+        //         monthlyTemp: Array.from({length: 12}, (_, i) => temp + Math.sin(i * 0.5) * 5),
+        //         monthlyRain: Array.from({length: 12}, (_, i) => {
+        //             // Monsoon pattern for India
+        //             if (i >= 5 && i <= 9) return rain * 0.2; // Monsoon months
+        //             return rain * 0.05; // Dry months
+        //         })
+        //     };
+        // }
+
+        // function useFallbackData() {
+        //     console.log("Using fallback data for analysis");
+        //     const soilData = getFallbackSoilData(farmData.location.latitude, farmData.location.longitude);
+        //     const climateData = getFallbackClimateData(farmData.location.latitude, farmData.location.longitude);
+        //     const recommendations = analyzeCropSuitability(soilData, climateData);
+        //     updateResultsUI(soilData, climateData, recommendations);
+        // }
+                // Location-specific data functions (REPLACES old fallback functions)
+        function getLocationSpecificSoilData(lat, lon) {
+            let soilPh, organicCarbon, nitrogenLevel, soilType;
+            
+            // Real Indian soil patterns
+            if (lat > 30.0) {
+                // Himalayan region
+                soilPh = 6.2;
+                organicCarbon = 2.0;
+                nitrogenLevel = 1400;
+                soilType = "Mountain Soil";
+            } else if (lat > 28.0 && lon < 75.0) {
+                // Western Dry region (Rajasthan)
+                soilPh = 8.0;
+                organicCarbon = 0.8;
+                nitrogenLevel = 800;
+                soilType = "Desert Soil";
+            } else if (lat > 25.0 && lon > 85.0) {
+                // Eastern region
+                soilPh = 6.0;
+                organicCarbon = 1.5;
+                nitrogenLevel = 1300;
+                soilType = "Red Soil";
+            } else if (lat > 20.0 && lat <= 25.0) {
+                // Northern Plains
+                soilPh = 7.2;
+                organicCarbon = 1.8;
+                nitrogenLevel = 1500;
+                soilType = "Alluvial Soil";
+            } else if (lat > 15.0 && lat <= 20.0) {
+                // Southern Plateau
+                soilPh = 6.8;
+                organicCarbon = 1.2;
+                nitrogenLevel = 1100;
+                soilType = "Black Cotton Soil";
             } else {
-                return { ph: 6.5, organicCarbon: 1.5, nitrogen: 1300 }; // General
+                // Coastal region
+                soilPh = 7.5;
+                organicCarbon = 1.0;
+                nitrogenLevel = 1000;
+                soilType = "Coastal Alluvial";
             }
+            
+            return { soilPh, organicCarbon, nitrogenLevel, soilType };
         }
 
-        function getFallbackClimateData(lat, lon) {
-            // Regional climate patterns for India
-            let temp = 25, rain = 1000, sunshine = 6;
+        function getLocationSpecificClimateData(lat, lon) {
+            let avgTemperature, annualRainfall, sunshineHours, climateZone;
             
-            if (lat > 20 && lat < 30) {
-                temp = 28; rain = 800; sunshine = 7; // North
-            } else if (lat > 10 && lat < 20) {
-                temp = 32; rain = 1200; sunshine = 6; // Central
-            } else if (lat < 10) {
-                temp = 30; rain = 2500; sunshine = 5; // South
+            // Real Indian climate patterns
+            if (lat > 30.0) {
+                // Himalayan
+                avgTemperature = 18.0;
+                annualRainfall = 1500;
+                sunshineHours = 6.5;
+                climateZone = "Mountain";
+            } else if (lat > 28.0 && lon < 75.0) {
+                // Western Dry
+                avgTemperature = 28.0;
+                annualRainfall = 300;
+                sunshineHours = 8.0;
+                climateZone = "Arid";
+            } else if (lat > 25.0 && lon > 85.0) {
+                // Eastern
+                avgTemperature = 26.0;
+                annualRainfall = 1200;
+                sunshineHours = 6.5;
+                climateZone = "Humid Subtropical";
+            } else if (lat > 20.0 && lat <= 25.0) {
+                // Northern Plains
+                avgTemperature = 22.0;
+                annualRainfall = 800;
+                sunshineHours = 7.0;
+                climateZone = "Subtropical";
+            } else if (lat > 15.0 && lat <= 20.0) {
+                // Southern Plateau
+                avgTemperature = 28.0;
+                annualRainfall = 900;
+                sunshineHours = 6.0;
+                climateZone = "Tropical Savanna";
+            } else {
+                // Coastal
+                avgTemperature = 30.0;
+                annualRainfall = 2000;
+                sunshineHours = 5.5;
+                climateZone = "Tropical Coastal";
             }
             
-            return {
-                temperature: temp,
-                rainfall: rain,
-                sunshine: sunshine,
-                monthlyTemp: Array.from({length: 12}, (_, i) => temp + Math.sin(i * 0.5) * 5),
-                monthlyRain: Array.from({length: 12}, (_, i) => {
-                    // Monsoon pattern for India
-                    if (i >= 5 && i <= 9) return rain * 0.2; // Monsoon months
-                    return rain * 0.05; // Dry months
-                })
+            // Add monthly data for chart
+            const monthlyTemp = Array.from({length: 12}, (_, i) => {
+                const baseTemp = avgTemperature;
+                const variation = Math.sin(i * 0.5) * 8; // Seasonal variation
+                return baseTemp + variation;
+            });
+            
+            const monthlyRain = Array.from({length: 12}, (_, i) => {
+                // Monsoon pattern for India
+                if (i >= 5 && i <= 9) return annualRainfall * 0.15; // Monsoon months
+                return annualRainfall * 0.05; // Dry months
+            });
+            
+            return { 
+                avgTemperature, 
+                annualRainfall, 
+                sunshineHours, 
+                climateZone,
+                monthlyTemp,
+                monthlyRain
             };
         }
 
-        function useFallbackData() {
-            console.log("Using fallback data for analysis");
-            const soilData = getFallbackSoilData(farmData.location.latitude, farmData.location.longitude);
-            const climateData = getFallbackClimateData(farmData.location.latitude, farmData.location.longitude);
-            const recommendations = analyzeCropSuitability(soilData, climateData);
-            updateResultsUI(soilData, climateData, recommendations);
+        // Location-specific crop recommendations
+        function analyzeLocationSpecificCrops(soilData, climateData) {
+            const lat = farmData.location.latitude;
+            const lon = farmData.location.longitude;
+            
+            let crops = [];
+            
+            // Different crops for different regions
+            if (lat > 30.0) {
+                // Himalayan - Apple, Potato, Maize
+                crops = [
+                    { crop: { name: "Apple", season: "Annual", duration: 365, yield: "15-20 tons/ha", waterRequirement: "Medium" }, score: 85 },
+                    { crop: { name: "Potato", season: "Rabi", duration: 100, yield: "20-25 tons/ha", waterRequirement: "High" }, score: 82 },
+                    { crop: { name: "Maize", season: "Kharif", duration: 85, yield: "2-3 tons/ha", waterRequirement: "Medium" }, score: 78 },
+                    { crop: { name: "Saffron", season: "Annual", duration: 365, yield: "2-3 kg/ha", waterRequirement: "Low" }, score: 90 },
+                    { crop: { name: "Raju", season: "Kharif", duration: 75, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 75 }
+                ];
+            } else if (lat > 28.0 && lon < 75.0) {
+                // Western Dry - Millets, Pulses
+                crops = [
+                    { crop: { name: "Pearl Millet", season: "Kharif", duration: 85, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 95 },
+                    { crop: { name: "Cluster Bean", season: "Kharif", duration: 90, yield: "0.5-1 ton/ha", waterRequirement: "Very Low" }, score: 88 },
+                    { crop: { name: "Moong Bean", season: "Kharif", duration: 65, yield: "0.5-1 ton/ha", waterRequirement: "Low" }, score: 82 },
+                    { crop: { name: "Guar", season: "Kharif", duration: 95, yield: "1-2 tons/ha", waterRequirement: "Very Low" }, score: 90 },
+                    { crop: { name: "Isabgol", season: "Rabi", duration: 110, yield: "1-1.5 tons/ha", waterRequirement: "Low" }, score: 85 }
+                ];
+            } else if (lat > 25.0 && lon > 85.0) {
+                // Eastern - Rice, Pulses
+                crops = [
+                    { crop: { name: "Rice", season: "Kharif", duration: 90, yield: "3-5 tons/ha", waterRequirement: "High" }, score: 88 },
+                    { crop: { name: "Pulses", season: "Rabi", duration: 100, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 85 },
+                    { crop: { name: "Oilseeds", season: "Rabi", duration: 110, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 80 },
+                    { crop: { name: "Maize", season: "Kharif", duration: 85, yield: "2-3 tons/ha", waterRequirement: "Medium" }, score: 78 },
+                    { crop: { name: "Vegetables", season: "Year-round", duration: 60, yield: "15-20 tons/ha", waterRequirement: "High" }, score: 82 }
+                ];
+            } else if (lat > 20.0 && lat <= 25.0) {
+                // Northern Plains - Wheat, Rice, Sugarcane
+                crops = [
+                    { crop: { name: "Wheat", season: "Rabi", duration: 120, yield: "4-5 tons/ha", waterRequirement: "Medium" }, score: 90 },
+                    { crop: { name: "Rice", season: "Kharif", duration: 90, yield: "4-6 tons/ha", waterRequirement: "High" }, score: 85 },
+                    { crop: { name: "Sugarcane", season: "Annual", duration: 365, yield: "70-80 tons/ha", waterRequirement: "High" }, score: 88 },
+                    { crop: { name: "Maize", season: "Kharif", duration: 85, yield: "3-4 tons/ha", waterRequirement: "Medium" }, score: 80 },
+                    { crop: { name: "Mustard", season: "Rabi", duration: 110, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 75 }
+                ];
+            } else if (lat > 15.0 && lat <= 20.0) {
+                // Southern Plateau - Cotton, Groundnut
+                crops = [
+                    { crop: { name: "Cotton", season: "Kharif", duration: 150, yield: "2-3 tons/ha", waterRequirement: "Medium" }, score: 88 },
+                    { crop: { name: "Groundnut", season: "Kharif", duration: 105, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 85 },
+                    { crop: { name: "Sunflower", season: "Rabi", duration: 95, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 80 },
+                    { crop: { name: "Sugarcane", season: "Annual", duration: 365, yield: "80-100 tons/ha", waterRequirement: "High" }, score: 82 },
+                    { crop: { name: "Sorghum", season: "Kharif", duration: 90, yield: "2-3 tons/ha", waterRequirement: "Low" }, score: 78 }
+                ];
+            } else {
+                // Coastal - Coconut, Banana
+                crops = [
+                    { crop: { name: "Coconut", season: "Annual", duration: 365, yield: "80-100 nuts/tree", waterRequirement: "Medium" }, score: 92 },
+                    { crop: { name: "Rice", season: "Kharif", duration: 90, yield: "5-7 tons/ha", waterRequirement: "High" }, score: 88 },
+                    { crop: { name: "Banana", season: "Annual", duration: 365, yield: "40-50 tons/ha", waterRequirement: "High" }, score: 85 },
+                    { crop: { name: "Black Pepper", season: "Annual", duration: 365, yield: "500-800 kg/ha", waterRequirement: "Medium" }, score: 80 },
+                    { crop: { name: "Cashew", season: "Annual", duration: 365, yield: "1-2 tons/ha", waterRequirement: "Low" }, score: 75 }
+                ];
+            }
+            
+            return crops;
         }
 
+        function useLocationSpecificFallbackData() {
+            console.log("Using location-specific fallback data");
+            const soilData = getLocationSpecificSoilData(farmData.location.latitude, farmData.location.longitude);
+            const climateData = getLocationSpecificClimateData(farmData.location.latitude, farmData.location.longitude);
+            const recommendations = analyzeLocationSpecificCrops(soilData, climateData);
+            updateResultsUI(soilData, climateData, recommendations);
+        }
         function showLoadingState() {
             // Show loading states in various sections
             document.querySelectorAll('.loading-text').forEach(el => {
@@ -788,6 +1676,12 @@
                     </span>
                 </div>
             `).join('');
+            
+
+
+
+
+
         }
     </script>
 

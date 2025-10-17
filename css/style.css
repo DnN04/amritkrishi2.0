@@ -35,7 +35,7 @@ body {
 }
 
 /* Background Image */
-.background-image {
+/* .background-image {
     position: absolute;
     inset: 0;
     background-image: url('../assets/images/wheat-field.jpg');
@@ -48,7 +48,7 @@ body {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
-}
+} */
 
 /* Main Content */
 .main-content {

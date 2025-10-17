@@ -13,3 +13,19 @@ amrit-krishi-frontend/
 └── assets/
     └── images/
         └── wheat-field.jpg
+
+
+amritkrishi-backend/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/
+│       │       └── amritkrishi/
+│       │           ├── AmritKrishiApplication.java
+│       │           ├── controller/
+│       │           ├── model/
+│       │           ├── repository/
+│       │           └── service/
+│       └── resources/
+│           └── application.properties
+└── pom.xml
