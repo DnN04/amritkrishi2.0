@@ -22,16 +22,50 @@
                     <span class="logo-text" data-i18n="navTitle">AmritKrishi</span>
                 </a>
                 <div class="nav-links">
-                    <button class="nav-link" data-i18n="navFeatures">Features</button>
+                    <!-- <button class="nav-link" data-i18n="navFeatures">Features</button>
                     <button class="nav-link" data-i18n="navLanguage">Language</button>
-                    <button class="nav-link" data-i18n="navAbout">About</button>
+                    <button class="nav-link" data-i18n="navAbout">About</button> -->
+                    <div class="nav-links">
+    <!-- <a href="index.html" class="nav-link">Home</a> -->
+    <a href="about.html" class="nav-link">About</a>
+        <a href="features.html" class="nav-link">Features</a>
+    <!-- <a href="location.html" class="nav-link">Location</a>
+    <a href="results.html" class="nav-link">Results</a> -->
+</div>
+                    
                 </div>
             </div>
-            <div class="nav-right">
+            <!-- <div class="nav-right">
                 <div class="current-language-display">
                     <span id="currentLangDisplay">English</span>
                 </div>
-            </div>
+            </div> -->
+            <div class="nav-right">
+    <div class="language-select-container">
+        <select id="languageSelect" class="language-select">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
+            <option value="or">ଓଡ଼ିଆ</option>
+        </select>
+    </div>
+</div>
+<!-- <div class="nav-right">
+    <div class="custom-language-dropdown">
+        <div class="dropdown-selected" id="languageSelected">
+            <span>English</span>
+            <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 10l5 5 5-5z"/>
+            </svg>
+        </div>
+        <div class="dropdown-options" id="languageOptions">
+            <div class="dropdown-option" data-value="en">English</div>
+            <div class="dropdown-option" data-value="hi">हिंदी</div>
+            <div class="dropdown-option" data-value="pa">ਪੰਜਾਬੀ</div>
+            <div class="dropdown-option" data-value="or">ଓଡ଼ିଆ</div>
+        </div>
+    </div>
+</div> -->
         </nav>
 
         <!-- Location Input Content -->
@@ -991,6 +1025,317 @@ function getRegionCoordinates(searchTerm) {
                 transform: translateY(0);
             }
         }
-    </style>
+
+        /* Language Dropdown Styles
+.language-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.language-dropdown-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.language-dropdown-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.current-language {
+    font-weight: 500;
+}
+
+.dropdown-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.language-dropdown-btn:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.language-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #2d2d2d;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    min-width: 120px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.language-option {
+    padding: 0.75rem 1rem;
+    color: white;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.language-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #00ff88;
+} */
+
+/* Ultra Premium Language Select */
+.language-select-container {
+    position: relative;
+    display: inline-block;
+}
+
+.language-select {
+    background: linear-gradient(135deg, 
+        rgba(40, 40, 40, 0.9) 0%, 
+        rgba(30, 30, 30, 0.9) 100%);
+    border: 1px solid;
+    border-image: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.2), 
+        rgba(255, 255, 255, 0.1)) 1;
+    color: white;
+    padding: 0.7rem 3rem 0.7rem 1.2rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-width: 150px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ff88'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem top 50%;
+    background-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.language-select::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(0, 255, 136, 0.1), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.language-select:hover::before {
+    left: 100%;
+}
+
+.language-select:hover {
+    background: linear-gradient(135deg, 
+        rgba(50, 50, 50, 0.9) 0%, 
+        rgba(40, 40, 40, 0.9) 100%);
+    border-image: linear-gradient(135deg, 
+        rgba(0, 255, 136, 0.4), 
+        rgba(0, 217, 255, 0.4)) 1;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.language-select:focus {
+    outline: none;
+    border-image: linear-gradient(135deg, 
+        rgba(0, 255, 136, 0.6), 
+        rgba(0, 217, 255, 0.6)) 1;
+    box-shadow: 
+        0 0 0 3px rgba(0, 255, 136, 0.1),
+        0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.language-select option {
+    background: #2d2d2d;
+    color: white;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.language-select option:hover {
+    background: rgba(0, 255, 136, 0.2);
+}
+
+.language-select option:checked {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 217, 255, 0.3));
+    color: #00ff88;
+    font-weight: 600;
+}
+   
+   /* Custom Language Dropdown - No Rectangular Box */
+.custom-language-dropdown {
+    position: relative;
+    display: inline-block;
+    min-width: 140px;
+}
+
+.dropdown-selected {
+    background: linear-gradient(135deg, 
+        rgba(40, 40, 40, 0.9) 0%, 
+        rgba(30, 30, 30, 0.9) 100%);
+    border: 1px solid;
+    border-image: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.2), 
+        rgba(255, 255, 255, 0.1)) 1;
+    color: white;
+    padding: 0.7rem 1.2rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1001;
+}
+
+.dropdown-selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(0, 255, 136, 0.1), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.dropdown-selected:hover::before {
+    left: 100%;
+}
+
+.dropdown-selected:hover {
+    background: linear-gradient(135deg, 
+        rgba(50, 50, 50, 0.9) 0%, 
+        rgba(40, 40, 40, 0.9) 100%);
+    border-image: linear-gradient(135deg, 
+        rgba(0, 255, 136, 0.4), 
+        rgba(0, 217, 255, 0.4)) 1;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+    color: #00ff88;
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, 
+        rgba(40, 40, 40, 0.95) 0%, 
+        rgba(30, 30, 30, 0.95) 100%);
+    border: 1px solid;
+    border-image: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15), 
+        rgba(255, 255, 255, 0.1)) 1;
+    border-radius: 1rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 15px 50px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    display: none;
+    z-index: 1002;
+    overflow: hidden;
+}
+
+.dropdown-option {
+    padding: 0.8rem 1rem;
+    color: white;
+    cursor: pointer;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0.1rem 0;
+}
+
+.dropdown-option:hover {
+    background: linear-gradient(135deg, 
+        rgba(0, 255, 136, 0.2) 0%, 
+        rgba(0, 217, 255, 0.2) 100%);
+    color: #00ff88;
+    transform: translateX(5px);
+}
+
+/* When dropdown is active */
+.custom-language-dropdown.active .dropdown-options {
+    display: block;
+    animation: dropdownFadeIn 0.3s ease;
+}
+
+.custom-language-dropdown.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Close dropdown when clicking outside */
+.dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 1000;
+    display: none;
+}
+
+.custom-language-dropdown.active ~ .dropdown-overlay {
+    display: block;
+}
+   </style>
 </body>
 </html>
